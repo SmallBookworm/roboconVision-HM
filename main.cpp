@@ -2,7 +2,6 @@
 #include <thread>
 #include <csignal>
 #include <sys/time.h>
-#include "LineTracker.h"
 #include "serial.hpp"
 #include "Info.h"
 #include "lineTest.h"
@@ -53,7 +52,6 @@ int main() {
     thread thread11(rtlFinder, ref(rtlInfo));
     thread11.detach();
 
-    LineTracker lineTracker;
     LineInfo lineInfo;
     Info info;
     while (true) {
@@ -67,28 +65,6 @@ int main() {
         //cout << info.result.data << " length:" << sizeof(info.result.data) << endl;
         if (info.push(rdata) <= 0)continue;
         //wdata.meta.dataArea[0] = 0;
-        //position(coordinate)
-        if ((info.result.meta.flag1[0] & (1)) != 0) {
-            Point2f point;
-            VideoCapture cap(2);
-            if (!cap.isOpened()) {
-                cerr << "capture is closed\n";
-                continue;
-            }
-            Mat frame;
-            cap >> frame;
-            if (frame.empty()) {
-                cerr << "frame is empty\n";
-                continue;
-            }
-            lineTracker.watch(frame, &point);
-            short x = static_cast<short>(point.x);
-            memcpy(wdata.meta.positionX, &x, sizeof(x));
-            short y = static_cast<short>(point.y);
-            memcpy(wdata.meta.positionY, &y, sizeof(y));
-            //valid data
-            wdata.meta.dataArea[0] |= 0x01;
-        }
         //cout << "Docking mode" << (info.result.meta.flag1[0] & (1 << 1)) << endl;
         //Docking mode
         if ((info.result.meta.flag1[0] & (1 << 1)) != 0) {

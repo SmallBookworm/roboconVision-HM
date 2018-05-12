@@ -366,7 +366,7 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
 //    all_data.push_back(rightToCenter);
     //namedWindow("final", 0);
     imshow("final", paint);
-    waitKey(0);
+    waitKey(10);
     return all_data;
 }
 
