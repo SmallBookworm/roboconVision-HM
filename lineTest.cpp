@@ -304,8 +304,7 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
         float *data1 = locateToLocate.ptr<float>(0);
         float x = data1[0];
-        float *data2 = locateToLocate.ptr<float>(0);
-        float y = data2[1];
+        float y = data1[1];
         all_data.push_back(angle);
         all_data.push_back(x);
         all_data.push_back(y);
@@ -328,8 +327,7 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
         float *data1 = locateToLocate.ptr<float>(0);
         float x = data1[0];
-        float *data2 = locateToLocate.ptr<float>(0);
-        float y = data2[1];
+        float y = data1[1];
         all_data.push_back(angle);
         all_data.push_back(x);
         all_data.push_back(y);
@@ -356,8 +354,7 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
         float *data1 = locateToLocate.ptr<float>(0);
         float x = data1[0];
-        float *data2 = locateToLocate.ptr<float>(0);
-        float y = data2[1];
+        float y = data1[1];
         all_data.push_back(angle);
         all_data.push_back(x);
         all_data.push_back(y);
