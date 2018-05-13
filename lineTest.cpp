@@ -270,15 +270,17 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
     return lines;
 }
 
-vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption right_line,
-                                vector<Vec4i> lines) {
 
+
+vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption right_line,
+                      vector<Vec4i> lines) {
     vector<float> all_data;
     float pix_left_height = left_line.pixheight(0, lines);
     float pix_right_height = right_line.pixheight(3, lines);
     float real_left_D = left_line.realdist(0, lines);//左灯条左边的真实距离
     float real_right_D = right_line.realdist(3, lines);//右灯条右边的真实距离
-
+    //cout << "sld" <<real_left_D<<endl;
+    //cout << "srd" <<real_right_D << endl;
     //求角度
     float pic_angle = AngleCalculate(real_left_D, real_right_D);
     float angle = pic_angle - SINIT_ANGLE;
@@ -286,19 +288,19 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
     float leftToCenter = left_line.centerPoint(0, lines).x - WIDTH / 2;//pix
     float rightToCenter = right_line.centerPoint(3, lines).x - WIDTH / 2;//pix
     int r = 2;
-    if (pix_left_height - pix_right_height > 2) {
-        float real_delta_x = (float) SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
-                                                     (float) SLEFTTOCENTER / (float) SPIX_LIGHT_HEIGHT);//#########改过
-        float real_delta_d = real_left_D - SD;
-        float a[2] = {real_delta_x, real_delta_d};
+    if (pix_left_height - pix_right_height > DELTA_HEIGHT) {
+        float real_delta_x = (float)SREAL_HEIGHT * ((float)leftToCenter / (float)left_line.pixheight(0, lines) -
+                                                    (float)SLEFTTOCENTER / (float)SPIX_LEFT_HEIGHT);//#########改过
+        float real_delta_d = real_left_D - SLEFTD;
+        float a[2] = { real_delta_x, real_delta_d };
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {SLEFTTOCENTER * (float) SREAL_WIDTH / (float) SPIX_LIGHT_WIDTH, SD};
+        float b[2] = { leftToCenter * (float)SREAL_HEIGHT / (float)left_line.pixheight(0, lines), SLEFTD };
         Mat bv = Mat(2, 1, CV_32FC1, b);
-        float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
+        float rotate[4] = { cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian) };
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
         Mat cv = rotatev * bv;
         Mat dv = bv + av - cv;
-        float lc[2] = {0, 259};//*****************************
+        float lc[2] = { 0, 227 };//*****************************
         Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
         Mat locateToCamera2 = rotatev * locateToCamera1;
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -309,46 +311,19 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
         all_data.push_back(x);
         all_data.push_back(y);
     }
-    if (pix_right_height - pix_left_height > 2) {
-        float real_delta_x = (float) SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(3, lines) -
-                                                     (float) SRIGHTTOCENTER / (float) SPIX_LIGHT_HEIGHT);
-        float real_delta_d = real_right_D - SD;
-        float a[2] = {real_delta_x, real_delta_d};
+    if (pix_left_height - pix_right_height <= DELTA_HEIGHT) {
+        float real_delta_x = (float)SREAL_HEIGHT * ((float)rightToCenter / (float)right_line.pixheight(3, lines) -
+                                                    (float)SRIGHTTOCENTER / (float)SPIX_RIGHT_HEIGHT);
+        float real_delta_d = real_right_D - SRIGHTD;
+        float a[2] = { real_delta_x, real_delta_d };
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {SRIGHTTOCENTER * (float) SREAL_WIDTH / (float) SPIX_LIGHT_WIDTH, SD};
+        float b[2] = { rightToCenter * (float)SREAL_HEIGHT / (float)right_line.pixheight(3, lines), SRIGHTD };
         Mat bv = Mat(2, 1, CV_32FC1, b);
-        float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
+        float rotate[4] = { cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian) };
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
         Mat cv = rotatev * bv;
         Mat dv = bv + av - cv;
-        float lc[2] = {0, 259};//*****************************
-        Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
-        Mat locateToCamera2 = rotatev * locateToCamera1;
-        Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
-        float *data1 = locateToLocate.ptr<float>(0);
-        float x = data1[0];
-        float y = data1[1];
-        all_data.push_back(angle);
-        all_data.push_back(x);
-        all_data.push_back(y);
-    }
-    if (abs(pix_left_height - pix_right_height) <= 2) {
-        radian = 0;
-        angle = 0;
-        float real_delta_x = (float) SREAL_HEIGHT * ((float) leftToCenter / (((float) left_line.pixheight(0, lines) +
-                                                                              (float) right_line.pixheight(3, lines)) /
-                                                                             2) -
-                                                     (float) SLEFTTOCENTER / (float) SPIX_LIGHT_HEIGHT);//#########改过
-        float real_delta_d = real_left_D - SD;
-        float a[2] = {real_delta_x, real_delta_d};
-        Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {SLEFTTOCENTER * (float) SREAL_WIDTH / (float) SPIX_LIGHT_WIDTH, SD};
-        Mat bv = Mat(2, 1, CV_32FC1, b);
-        float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
-        Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
-        Mat cv = rotatev * bv;
-        Mat dv = bv + av - cv;
-        float lc[2] = {0, 259};//*****************************
+        float lc[2] = { 0, 227 };//*****************************
         Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
         Mat locateToCamera2 = rotatev * locateToCamera1;
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -360,15 +335,16 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
         all_data.push_back(y);
     }
     /*调参数用*/
-//    all_data.push_back(pix_left_height);
-//    all_data.push_back(pix_right_height);
-//    all_data.push_back(leftToCenter);
-//    all_data.push_back(rightToCenter);
+    //    all_data.push_back(pix_left_height);
+    //    all_data.push_back(pix_right_height);
+    //    all_data.push_back(leftToCenter);
+    //    all_data.push_back(rightToCenter);
     //namedWindow("final", 0);
-    imshow("final", paint);
-    waitKey(10);
+    //imshow("final", paint);
+    //waitKey(10);//&&&&&&&&&&&&&&&&&&
     return all_data;
 }
+
 
 void LineTest::drawDetectLines(Mat &image, const vector<Vec4i> &lines, Scalar &color) {
     // 将检测到的直线在图上画出来
