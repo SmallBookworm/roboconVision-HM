@@ -17,12 +17,20 @@ using namespace cv;
 int state = 0x0;
 
 union Out wdata{};
+//joystick state
+unsigned char button = 0;
+unsigned char axis[sizeof(wdata.meta.axis)];
 
 MySerial ms = MySerial();
 int fd;
 
 void printMes(int signo) {
     //printf("Get a SIGALRM, signal NO:%d\n", signo);
+    //joystick
+    wdata.meta.button[0] |= button;
+    for (int i = 0; i < sizeof(axis); ++i) {
+        wdata.meta.axis[i] = axis[i];
+    }
     //sum flag
     assignSum(&wdata);
     ms.nwrite(fd, wdata.data, sizeof(wdata.data));
@@ -55,8 +63,11 @@ int main() {
 
     RtlFinder rtlFinder;
     RtlInfo rtlInfo;
-    thread thread11(rtlFinder, ref(rtlInfo));
-    thread11.detach();
+    bool test = true;
+    if (!test) {
+        thread thread11(rtlFinder, ref(rtlInfo));
+        thread11.detach();
+    }
 
     LineInfo lineInfo;
     Info info;
@@ -66,14 +77,16 @@ int main() {
         if (joystick.sample(&event)) {
             if (event.isButton()) {
                 //printf("Button %u is %s\n", event.number, event.value == 0 ? "up" : "down");
-                if(event.value==1)
-                wdata.meta.button[0]|=(1<<event.number);
+                if (event.value == 1)
+                    button |= (1 << event.number);
+                else
+                    button &= ~(1 << event.number);
             }
             if (event.isAxis()) {
-                int sum=32767*2;
-                //printf("Axis %u is at position %d\n", event.number, event.value*255/sum);
-                if(event.number< sizeof(wdata.meta.axis)){
-                    wdata.meta.axis[event.number]= static_cast<unsigned char>(event.value * 255 / sum);
+                int sum = 32767 * 2;
+                printf("Axis %u is at position %d\n", event.number, event.value*255/sum);
+                if (event.number < sizeof(wdata.meta.axis)) {
+                    axis[event.number] = static_cast<unsigned char>(event.value * 255 / sum);
                 }
             }
         }
@@ -83,7 +96,7 @@ int main() {
         //sometime read nothing
         if (n <= 0)
             continue;
-        //cout << int(rdata) << endl;
+        cout << int(rdata) << endl;
         //cout << info.result.data << " length:" << sizeof(info.result.data) << endl;
         if (info.push(rdata) <= 0)continue;
         //wdata.meta.dataArea[0] = 0;

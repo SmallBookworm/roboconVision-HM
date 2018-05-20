@@ -52,28 +52,24 @@ struct OutMeta {
     unsigned char head[2];
     unsigned char dataArea[1];
     unsigned char placeHold1[1];
-    unsigned char positionX[2];
-    unsigned char positionY[2];
-    unsigned char angle[4];
     unsigned char dockDModule[4];
     unsigned char dockArgument[4];
     unsigned char dockRAngle[4];
-    unsigned char ringF1[1];
-    unsigned char placeHold2[3];
-    unsigned char ballDX[4];
-    unsigned char ballDY[4];
     unsigned char xAngle[8];
     unsigned char yAngle[8];
     unsigned char xDis[8];
     unsigned char yDis[8];
     unsigned char button[1];
-    unsigned char axis[3];
+    unsigned char axis[7];
     unsigned char sum[sumNum];
+    unsigned char placeHold2[4];
 };
 union Out {
-    unsigned char data[76];
+    unsigned char data[64];
     OutMeta meta{head:{static_cast<unsigned char>(0xaa), static_cast<unsigned char>(0xbb)}};
 };
+
+static const int sumPH = sumNum + 4;
 
 void assignSum(union Out *res);
 
