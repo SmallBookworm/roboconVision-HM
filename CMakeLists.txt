@@ -7,7 +7,8 @@ find_package(OpenCV REQUIRED)
 
 set(SOURCE_FILES main.cpp serial.cpp Info.cpp Info.h
         lineTest.cpp lineInfo.cpp linesOption.cpp
-        rtlFinder.cpp rtlFinder.h rtlInfo.cpp rtlInfo.h)
+        rtlFinder.cpp rtlFinder.h rtlInfo.cpp rtlInfo.h
+        joystick.cc)
 
 add_executable(roboconVisionHM ${SOURCE_FILES})
 

@@ -66,10 +66,12 @@ struct OutMeta {
     unsigned char yAngle[8];
     unsigned char xDis[8];
     unsigned char yDis[8];
+    unsigned char button[1];
+    unsigned char axis[3];
     unsigned char sum[sumNum];
 };
 union Out {
-    unsigned char data[72];
+    unsigned char data[76];
     OutMeta meta{head:{static_cast<unsigned char>(0xaa), static_cast<unsigned char>(0xbb)}};
 };
 

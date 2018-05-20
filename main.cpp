@@ -6,6 +6,7 @@
 #include "Info.h"
 #include "lineTest.h"
 #include "rtlFinder.h"
+#include "joystick.hh"
 
 #define DOCKING_MODE 0x1
 #define DROP_MODE 0x2
@@ -43,6 +44,11 @@ int main() {
     if (setitimer(ITIMER_REAL, &tick, NULL) < 0)
         printf("Set time fail!");
 
+    //joystick
+    Joystick joystick;
+    if (!joystick.isFound()) {
+        printf("open failed.\n");
+    }
 
     //union Out s{};
     //cout << s.data << " length:" << sizeof(s.data) << endl;
@@ -55,6 +61,22 @@ int main() {
     LineInfo lineInfo;
     Info info;
     while (true) {
+        //joystick control
+        JoystickEvent event;
+        if (joystick.sample(&event)) {
+            if (event.isButton()) {
+                //printf("Button %u is %s\n", event.number, event.value == 0 ? "up" : "down");
+                if(event.value==1)
+                wdata.meta.button[0]|=(1<<event.number);
+            }
+            if (event.isAxis()) {
+                int sum=32767*2;
+                //printf("Axis %u is at position %d\n", event.number, event.value*255/sum);
+                if(event.number< sizeof(wdata.meta.axis)){
+                    wdata.meta.axis[event.number]= static_cast<unsigned char>(event.value * 255 / sum);
+                }
+            }
+        }
         //read message
         unsigned char rdata;
         int n = ms.nread(fd, &rdata, 1);
