@@ -296,7 +296,8 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
         float real_delta_d = real_left_D - SLEFTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {leftToCenter * (float) SREAL_HEIGHT / (float) left_line.pixheight(0, lines), SLEFTD};
+        //real_x,s_left_dis
+        float b[2] = {SREAL_HEIGHT*SLEFTTOCENTER/(float)SPIX_LEFT_HEIGHT, SLEFTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -319,7 +320,7 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
         float real_delta_d = real_right_D - SRIGHTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {rightToCenter * (float) SREAL_HEIGHT / (float) right_line.pixheight(3, lines), SRIGHTD};
+        float b[2] = {SREAL_HEIGHT*SRIGHTTOCENTER/(float)SPIX_RIGHT_HEIGHT, SRIGHTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);

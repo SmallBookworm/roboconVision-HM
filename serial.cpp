@@ -102,19 +102,19 @@ int MySerial::open_port(int comport)                 //通过参数，打开相�
         //O_RDWR读写模式 O_NOCTTY如果路径名指向终端设备,不要把这个设备用作控制终端 O_NDELAY表示不关心DCD信号所处的状态（端口的另一端是否激活或者停止）
         fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
         if (-1 == fd) {
-            perror("Can't Open Serial /dev/ttyS0 Port");
+            perror("Can't Open Serial /dev/ttyUSB0 Port");
             return (-1);
         }
     } else if (comport == 2) {
-        fd = open("/dev/ttyS1", O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
+        fd = open("/dev/ttyUSB1", O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
         if (-1 == fd) {
-            perror("Can't Open Serial /dev/ttyS1 Port");
+            perror("Can't Open Serial /dev/ttyUSB1 Port");
             return (-1);
         }
     } else if (comport == 3) {
-        fd = open("/dev/ttyS2", O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
+        fd = open("/dev/ttyUSB2", O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
         if (-1 == fd) {
-            perror("Can't Open Serial /dev/ttyS2 Port");
+            perror("Can't Open Serial /dev/ttyUSB2 Port");
             return (-1);
         }
     }
