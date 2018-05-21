@@ -146,7 +146,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
     for (int i = 0; i < contours.size(); i++) {
         Point2f P[4];
 
-        if (contours[i].capacity() > 200) //change according to fps
+        if (contours[i].size() > 70) //change according to fps
         {
             Vec4i leftLine;
             Vec4i rightLine;
@@ -172,7 +172,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
             int leftDownD = 0;
             int rightUp = 0;
             int rightUpD = 0;
-
+            //find 4 max or min points
             for (int j = 0; j < contours[i].size(); j++) {
                 if (contours[i][j].x * contours[i][j].y > rightDown) {
                     rightDownD = j;
@@ -192,6 +192,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                 }
 
             }
+            //maek sure corner by average points around the found 4 points
             for (int j = 0; j < contours[i].size(); j++) {
                 if (contours[i][j].y > (contours[i][rightDownD].y - AVG) &&
                     contours[i][j].y < (contours[i][rightDownD].y + AVG)) {
@@ -231,16 +232,16 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                         tempHigh1 = P[j].x;
                     }
                     if (tempHigh1 > P[j].x) {
-                        leftLine[0] = tempHigh1 + 1;
+                        leftLine[0] = P[j].x + 1;
                         leftLine[1] = averageLeftDownY;//左下
-                        rightLine[0] = P[j].x + 1;
+                        rightLine[0] = tempHigh1 + 1;
                         rightLine[1] = averageRightDownY;//右下
                     }
                     if (tempHigh1 < P[j].x) {
-                        rightLine[0] = tempHigh1 + 1;
-                        rightLine[1] = averageLeftDownY;//左下
-                        leftLine[0] = P[j].x - 1;
-                        leftLine[1] = averageRightDownY;//右下
+                        rightLine[0] = P[j].x + 1;
+                        rightLine[1] = averageLeftDownY;//右下
+                        leftLine[0] = tempHigh1 - 1;
+                        leftLine[1] = averageRightDownY;//左下
                     }
                 }
                 if (P[j].y < rect.center.y) {
@@ -248,16 +249,16 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                         tempLow1 = P[j].x;
                     }
                     if (tempLow1 > P[j].x) {
-                        leftLine[2] = tempLow1 + 1;
+                        leftLine[2] = P[j].x + 1;
                         leftLine[3] = averageLeftUpY + 2;//左上
-                        rightLine[2] = P[j].x - 1;
+                        rightLine[2] = tempLow1 - 1;
                         rightLine[3] = averageRightUpY + 2;//右上
                     }
                     if (tempLow1 < P[j].x) {
-                        rightLine[2] = tempLow1 + 1;
-                        rightLine[3] = averageLeftUpY + 2;//左上
-                        leftLine[2] = P[j].x - 1;
-                        leftLine[3] = averageRightUpY + 2;//右上
+                        rightLine[2] = P[j].x - 1;
+                        rightLine[3] = averageLeftUpY + 2;//右上
+                        leftLine[2] = tempLow1 + 1;
+                        leftLine[3] = averageRightUpY + 1;//左上
                     }
                 }
             }
@@ -266,14 +267,15 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
             lines.push_back(rightLine);
         }
     }
+    //x from small to big
     sort(lines.begin(), lines.end(), comp);
     return lines;
 }
 
 
-
-vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption right_line,
-                      vector<Vec4i> lines) {
+vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
+    LinesOption left_line;
+    LinesOption right_line;
     vector<float> all_data;
     float pix_left_height = left_line.pixheight(0, lines);
     float pix_right_height = right_line.pixheight(3, lines);
@@ -289,18 +291,18 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
     float rightToCenter = right_line.centerPoint(3, lines).x - WIDTH / 2;//pix
     int r = 2;
     if (pix_left_height - pix_right_height > DELTA_HEIGHT) {
-        float real_delta_x = (float)SREAL_HEIGHT * ((float)leftToCenter / (float)left_line.pixheight(0, lines) -
-                                                    (float)SLEFTTOCENTER / (float)SPIX_LEFT_HEIGHT);//#########改过
+        float real_delta_x = (float) SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
+                                                     (float) SLEFTTOCENTER / (float) SPIX_LEFT_HEIGHT);//#########改过
         float real_delta_d = real_left_D - SLEFTD;
-        float a[2] = { real_delta_x, real_delta_d };
+        float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = { leftToCenter * (float)SREAL_HEIGHT / (float)left_line.pixheight(0, lines), SLEFTD };
+        float b[2] = {leftToCenter * (float) SREAL_HEIGHT / (float) left_line.pixheight(0, lines), SLEFTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
-        float rotate[4] = { cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian) };
+        float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
         Mat cv = rotatev * bv;
         Mat dv = bv + av - cv;
-        float lc[2] = { 0, 227 };//*****************************
+        float lc[2] = {0, 227};//*****************************
         Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
         Mat locateToCamera2 = rotatev * locateToCamera1;
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -312,18 +314,18 @@ vector<float> LineTest::analyse(Mat paint, LinesOption left_line, LinesOption ri
         all_data.push_back(y);
     }
     if (pix_left_height - pix_right_height <= DELTA_HEIGHT) {
-        float real_delta_x = (float)SREAL_HEIGHT * ((float)rightToCenter / (float)right_line.pixheight(3, lines) -
-                                                    (float)SRIGHTTOCENTER / (float)SPIX_RIGHT_HEIGHT);
+        float real_delta_x = (float) SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(3, lines) -
+                                                     (float) SRIGHTTOCENTER / (float) SPIX_RIGHT_HEIGHT);
         float real_delta_d = real_right_D - SRIGHTD;
-        float a[2] = { real_delta_x, real_delta_d };
+        float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = { rightToCenter * (float)SREAL_HEIGHT / (float)right_line.pixheight(3, lines), SRIGHTD };
+        float b[2] = {rightToCenter * (float) SREAL_HEIGHT / (float) right_line.pixheight(3, lines), SRIGHTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
-        float rotate[4] = { cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian) };
+        float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
         Mat cv = rotatev * bv;
         Mat dv = bv + av - cv;
-        float lc[2] = { 0, 227 };//*****************************
+        float lc[2] = {0, 227};//*****************************
         Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
         Mat locateToCamera2 = rotatev * locateToCamera1;
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -371,11 +373,11 @@ int LineTest::watch(cv::Mat src) {
     GetDiffImage(mv[1], dst);
 
     //先膨胀，后腐蚀（联通区域）
+    threshold(dst, dst, 30, 255, THRESH_BINARY);
     cv::erode(dst, pBinary, elementC);
     cv::dilate(pBinary, dst, elementC);
-    threshold(dst, dst, 30, 255, THRESH_BINARY);
 
-    GaussianBlur(dst, dst, Size(3, 3), 0, 0);
+    //GaussianBlur(dst, dst, Size(3, 3), 0, 0);
     //imshow("eee",dst);
     //得到角点
     lines = findCorner(dst);
@@ -385,7 +387,7 @@ int LineTest::watch(cv::Mat src) {
     if (lines.size() == 4) {
         Scalar sca = Scalar(0, 0, 255);
         drawDetectLines(src, lines, sca);
-        data = analyse(src, left_line, right_line, lines);
+        data = analyse(src, lines);
         if (abs(data[0]) < angleThreshold) {
             data[0] = 0;
         }
@@ -430,22 +432,22 @@ int LineTest::operator()(LineInfo &info) {
     capture.set(CV_CAP_PROP_FRAME_WIDTH, WIDTH);
     capture.set(CV_CAP_PROP_FRAME_HEIGHT, HEIGHT);
 
-//    int fd = open("/dev/video1", O_RDWR);
-//    if (fd >= 0) {
-//        struct v4l2_control ctrl;
-//        ctrl.id = V4L2_CID_EXPOSURE_AUTO;
-//        ctrl.value = V4L2_EXPOSURE_MANUAL;
-//        int ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
-//
-//        struct v4l2_control ctrl1;
-//        ctrl1.id = V4L2_CID_EXPOSURE_ABSOLUTE;
-//        ctrl1.value=1;
-//        ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl1);
-//        if (ret < 0) {
-//            printf("Get exposure failed (%d)\n", ret);
-//        } else
-//            printf("\nGet Exposure :[%d]\n", ctrl1.value);
-//    }
+    int fd = open("/dev/video1", O_RDWR);
+    if (fd >= 0) {
+        struct v4l2_control ctrl;
+        ctrl.id = V4L2_CID_EXPOSURE_AUTO;
+        ctrl.value = V4L2_EXPOSURE_MANUAL;
+        int ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
+
+        struct v4l2_control ctrl1;
+        ctrl1.id = V4L2_CID_EXPOSURE_ABSOLUTE;
+        ctrl1.value = 3;
+        ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl1);
+        if (ret < 0) {
+            printf("Get exposure failed (%d)\n", ret);
+        } else
+            printf("\nGet Exposure :[%d]\n", ctrl1.value);
+    }
 
     Mat srcImage;
     if (!capture.isOpened()) {
