@@ -122,7 +122,7 @@ int main() {
             float res[3];
             int resF = lineInfo.get(res);
             if (resF > 0) {
-                wdata.meta.dataArea[0] |= 0x02;
+                wdata.meta.dataArea[0] |= 0x01;
                 memcpy(wdata.meta.dockDModule, &res[0], sizeof(res[0]));
                 memcpy(wdata.meta.dockArgument, &res[1], sizeof(res[0]));
                 memcpy(wdata.meta.dockRAngle, &res[2], sizeof(res[0]));
@@ -133,13 +133,18 @@ int main() {
         }
         //realtime find line
         double rtlCoordinate[4];
-        int res = rtlInfo.get(rtlCoordinate);
-        if (res >= 0) {
-            wdata.meta.dataArea[0] |= 0x08;
-            memcpy(wdata.meta.xAngle, &rtlCoordinate[0], sizeof(rtlCoordinate[0]));
-            memcpy(wdata.meta.yAngle, &rtlCoordinate[1], sizeof(rtlCoordinate[0]));
-            memcpy(wdata.meta.xDis, &rtlCoordinate[2], sizeof(rtlCoordinate[0]));
-            memcpy(wdata.meta.yDis, &rtlCoordinate[3], sizeof(rtlCoordinate[0]));
+        char res = rtlInfo.get(rtlCoordinate);
+        if (res > 0) {
+            if ((res & 1) != 0) {
+                wdata.meta.dataArea[0] |= 0x04;
+                memcpy(wdata.meta.xDis, &rtlCoordinate[2], sizeof(rtlCoordinate[0]));
+                memcpy(wdata.meta.xAngle, &rtlCoordinate[0], sizeof(rtlCoordinate[0]));
+            }
+            if ((res & 2) != 0) {
+                wdata.meta.dataArea[0] |= 0x08;
+                memcpy(wdata.meta.yDis, &rtlCoordinate[3], sizeof(rtlCoordinate[0]));
+                memcpy(wdata.meta.yAngle, &rtlCoordinate[1], sizeof(rtlCoordinate[0]));
+            }
         }
     }
     return 0;
