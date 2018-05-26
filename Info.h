@@ -55,6 +55,9 @@ struct OutMeta {
     unsigned char dockDModule[4];
     unsigned char dockArgument[4];
     unsigned char dockRAngle[4];
+    unsigned char ballDModule[4];
+    unsigned char ballArgument[4];
+    unsigned char ballRAngle[4];
     unsigned char xAngle[8];
     unsigned char yAngle[8];
     unsigned char xDis[8];

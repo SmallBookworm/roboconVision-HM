@@ -5,11 +5,12 @@
 #include "serial.hpp"
 #include "Info.h"
 #include "lineTest.h"
+#include "ballTake.h"
 #include "rtlFinder.h"
 #include "joystick.hh"
 
 #define DOCKING_MODE 0x1
-#define DROP_MODE 0x2
+#define TAKE_MODE 0x2
 
 using namespace std;
 using namespace cv;
@@ -72,6 +73,7 @@ int main() {
     }
 
     LineInfo lineInfo;
+    LineInfo ballTakeInfo;
     Info info;
     while (true) {
         //joystick control
@@ -130,6 +132,27 @@ int main() {
         } else if ((state & DOCKING_MODE) != 0) {
             state ^= DOCKING_MODE;
             lineInfo.setStop(true);
+        }
+        //Take mode
+        if ((info.result.meta.flag1[0] & (1 << 3)) != 0) {
+            if ((state & TAKE_MODE) == 0) {
+                state |= TAKE_MODE;
+                ballTakeInfo.init();
+                BallTake tracker;
+                thread thread1(tracker, ref(ballTakeInfo));
+                thread1.detach();
+            }
+            float res[3];
+            int resF = ballTakeInfo.get(res);
+            if (resF > 0) {
+                wdata.meta.dataArea[0] |= 0x02;
+                memcpy(wdata.meta.ballDModule, &res[0], sizeof(res[0]));
+                memcpy(wdata.meta.ballArgument, &res[1], sizeof(res[0]));
+                memcpy(wdata.meta.ballRAngle, &res[2], sizeof(res[0]));
+            }
+        } else if ((state & TAKE_MODE) != 0) {
+            state ^= TAKE_MODE;
+            ballTakeInfo.setStop(true);
         }
         //realtime find line
         double rtlCoordinate[4];
