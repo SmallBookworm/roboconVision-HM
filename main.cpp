@@ -146,9 +146,9 @@ int main() {
             int resF = ballTakeInfo.get(res);
             if (resF > 0) {
                 wdata.meta.dataArea[0] |= 0x02;
-                memcpy(wdata.meta.ballDModule, &res[0], sizeof(res[0]));
-                memcpy(wdata.meta.ballArgument, &res[1], sizeof(res[0]));
-                memcpy(wdata.meta.ballRAngle, &res[2], sizeof(res[0]));
+                memcpy(wdata.meta.dockDModule, &res[0], sizeof(res[0]));
+                memcpy(wdata.meta.dockArgument, &res[1], sizeof(res[0]));
+                memcpy(wdata.meta.dockRAngle, &res[2], sizeof(res[0]));
             }
         } else if ((state & TAKE_MODE) != 0) {
             state ^= TAKE_MODE;
@@ -159,14 +159,16 @@ int main() {
         char res = rtlInfo.get(rtlCoordinate);
         if (res > 0) {
             if ((res & 1) != 0) {
+                float line[]={static_cast<float>(rtlCoordinate[2]), static_cast<float>(rtlCoordinate[0])};
                 wdata.meta.dataArea[0] |= 0x04;
-                memcpy(wdata.meta.xDis, &rtlCoordinate[2], sizeof(rtlCoordinate[0]));
-                memcpy(wdata.meta.xAngle, &rtlCoordinate[0], sizeof(rtlCoordinate[0]));
+                memcpy(wdata.meta.xDis, &line[0], sizeof(line[0]));
+                memcpy(wdata.meta.xAngle, &line[1], sizeof(line[0]));
             }
             if ((res & 2) != 0) {
+                float line[]={static_cast<float>(rtlCoordinate[3]), static_cast<float>(rtlCoordinate[1])};
                 wdata.meta.dataArea[0] |= 0x08;
-                memcpy(wdata.meta.yDis, &rtlCoordinate[3], sizeof(rtlCoordinate[0]));
-                memcpy(wdata.meta.yAngle, &rtlCoordinate[1], sizeof(rtlCoordinate[0]));
+                memcpy(wdata.meta.yDis, &line[0], sizeof(line[0]));
+                memcpy(wdata.meta.yAngle, &line[1], sizeof(line[0]));
             }
         }
     }

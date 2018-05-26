@@ -55,13 +55,10 @@ struct OutMeta {
     unsigned char dockDModule[4];
     unsigned char dockArgument[4];
     unsigned char dockRAngle[4];
-    unsigned char ballDModule[4];
-    unsigned char ballArgument[4];
-    unsigned char ballRAngle[4];
-    unsigned char xAngle[8];
-    unsigned char yAngle[8];
-    unsigned char xDis[8];
-    unsigned char yDis[8];
+    unsigned char xAngle[4];
+    unsigned char yAngle[4];
+    unsigned char xDis[4];
+    unsigned char yDis[4];
     unsigned char button1[1];
     unsigned char button2[1];
     unsigned char axis[8];
@@ -69,7 +66,7 @@ struct OutMeta {
     unsigned char sum[sumNum];
 };
 union Out {
-    unsigned char data[64];
+    unsigned char data[48];
     OutMeta meta{head:{static_cast<unsigned char>(0xaa), static_cast<unsigned char>(0xbb)}};
 };
 
