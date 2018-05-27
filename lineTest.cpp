@@ -408,9 +408,9 @@ int LineTest::watch(cv::Mat src) {
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
 
-        cout << "angle: " << data_final[0] << endl;
-        cout << "vectAngle: " << data_final[1] << endl;
-        cout << "vectLength: " << data_final[2] << endl;
+        //cout << "angle: " << data_final[0] << endl;
+        //cout << "vectAngle: " << data_final[1] << endl;
+        //cout << "vectLength: " << data_final[2] << endl;
         info_value[0] = data_final[2];
         info_value[1] = data_final[1];
         info_value[2] = data_final[0];

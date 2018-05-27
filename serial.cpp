@@ -138,6 +138,7 @@ int MySerial::nwrite(int serialfd, const unsigned char *data, int datalength)  /
     // {
     len = 0;
     //len = write(serialfd, &data[total_len], datalength - total_len);
+    printf("fuck:%d\n",datalength);
     for (int i = 0; i < datalength; i++) {
         len += write(serialfd, &data[i], 1);
         //usleep(1000);
@@ -145,7 +146,7 @@ int MySerial::nwrite(int serialfd, const unsigned char *data, int datalength)  /
 //         if (len > 0) 
 //             total_len += len;          
 //    }
-    return (total_len);
+    return (len);
 }
 
 int MySerial::nread(int fd, void *data, int datalength)   //读取串口信息

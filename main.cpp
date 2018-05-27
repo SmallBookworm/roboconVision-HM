@@ -8,6 +8,7 @@
 #include "ballTake.h"
 #include "rtlFinder.h"
 #include "joystick.hh"
+#include "control.h"
 
 #define DOCKING_MODE 0x1
 #define TAKE_MODE 0x2
@@ -18,25 +19,28 @@ using namespace cv;
 int state = 0x0;
 
 union Out wdata{};
-//joystick state
-unsigned char button1 = 0;
-unsigned char button2 = 0;
-unsigned char axis[sizeof(wdata.meta.axis)];
+JSin jsin;
 
 MySerial ms = MySerial();
 int fd;
 
+//reduce code in interrupt
 void printMes(int signo) {
     //printf("Get a SIGALRM, signal NO:%d\n", signo);
     //joystick
-    wdata.meta.button1[0] |= button1;
-    wdata.meta.button2[0] |= button2;
-    for (int i = 0; i < sizeof(axis); ++i) {
-        wdata.meta.axis[i] = axis[i];
+    wdata.meta.button1[0] = jsin.js.button1;
+    wdata.meta.button2[0] = jsin.js.button2;
+    for (int i = 0; i < sizeof(jsin.js.axis); ++i) {
+        wdata.meta.axis[i] = jsin.js.axis[i];
     }
     //sum flag
     assignSum(&wdata);
-    ms.nwrite(fd, wdata.data, sizeof(wdata.data));
+    if (wdata.meta.head[1] != 0xbb) {
+        cout << "errh" << endl;
+    }
+    int a = ms.nwrite(fd, wdata.data, sizeof(wdata.data));
+    if (a != 48)
+        cout << a << endl;
     //restore
     wdata = {};
 }
@@ -55,12 +59,10 @@ int main() {
     if (setitimer(ITIMER_REAL, &tick, NULL) < 0)
         printf("Set time fail!");
 
-    //joystick
-    Joystick joystick;
-    if (!joystick.isFound()) {
-        printf("Joystick open failed.\n");
-    }
-
+    ControlInfo controlInfo;
+    Control control;
+    thread thread10(control, ref(controlInfo));
+    thread10.detach();
     //union Out s{};
     //cout << s.data << " length:" << sizeof(s.data) << endl;
 
@@ -77,30 +79,7 @@ int main() {
     Info info;
     while (true) {
         //joystick control
-        JoystickEvent event;
-        if (joystick.sample(&event)) {
-            if (event.isButton()) {
-                //printf("Button %u is %s\n", event.number, event.value == 0 ? "up" : "down");
-                if (event.value == 1) {
-                    if (event.number < 8)
-                        button1 |= (1 << event.number);
-                    else
-                        button2 |= (1 << (event.number - 8));
-                } else {
-                    if (event.number < 8)
-                        button1 &= ~(1 << event.number);
-                    else
-                        button2 &= ~(1 << (event.number - 8));
-                }
-            }
-            if (event.isAxis()) {
-                int sum = 32767 * 2;
-                //printf("Axis %u is at position %d\n", event.number, event.value*255/sum);
-                if (event.number < sizeof(wdata.meta.axis)) {
-                    axis[event.number] = static_cast<unsigned char>(event.value * 255 / sum);
-                }
-            }
-        }
+        jsin.js = controlInfo.get().js;
         //read message
         unsigned char rdata;
         int n = ms.nread(fd, &rdata, 1);
@@ -159,13 +138,13 @@ int main() {
         char res = rtlInfo.get(rtlCoordinate);
         if (res > 0) {
             if ((res & 1) != 0) {
-                float line[]={static_cast<float>(rtlCoordinate[2]), static_cast<float>(rtlCoordinate[0])};
+                float line[] = {static_cast<float>(rtlCoordinate[2]), static_cast<float>(rtlCoordinate[0])};
                 wdata.meta.dataArea[0] |= 0x04;
                 memcpy(wdata.meta.xDis, &line[0], sizeof(line[0]));
                 memcpy(wdata.meta.xAngle, &line[1], sizeof(line[0]));
             }
             if ((res & 2) != 0) {
-                float line[]={static_cast<float>(rtlCoordinate[3]), static_cast<float>(rtlCoordinate[1])};
+                float line[] = {static_cast<float>(rtlCoordinate[3]), static_cast<float>(rtlCoordinate[1])};
                 wdata.meta.dataArea[0] |= 0x08;
                 memcpy(wdata.meta.yDis, &line[0], sizeof(line[0]));
                 memcpy(wdata.meta.yAngle, &line[1], sizeof(line[0]));
