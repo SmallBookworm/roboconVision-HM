@@ -61,8 +61,8 @@ struct OutMeta {
     unsigned char yDis[4];
     unsigned char button1[1];
     unsigned char button2[1];
-    unsigned char axis[8];
-    unsigned char placeHold2[2];
+    unsigned char cSpinAngleASpeed[1];
+    unsigned char cAngle[1];
     unsigned char sum[sumNum];
 };
 union Out {

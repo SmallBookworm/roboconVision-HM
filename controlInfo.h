@@ -22,9 +22,11 @@ class ControlInfo {
 private:
 //joystick state
     JSin in;
+    bool used= true;
     std::mutex ci_mutex;
 public:
-    JSin get();
+    //true:success,false:fail
+    bool get(JSin &res);
 
     void set(unsigned char *cin);
 };

@@ -19,7 +19,10 @@ using namespace cv;
 int state = 0x0;
 
 union Out wdata{};
-JSin jsin;
+//init wdata when main thread post data too fast.
+bool initWdata = true;
+
+void setJSValue(JSin jsin, bool gear, bool gearButton);
 
 MySerial ms = MySerial();
 int fd;
@@ -27,22 +30,12 @@ int fd;
 //reduce code in interrupt
 void printMes(int signo) {
     //printf("Get a SIGALRM, signal NO:%d\n", signo);
-    //joystick
-    wdata.meta.button1[0] = jsin.js.button1;
-    wdata.meta.button2[0] = jsin.js.button2;
-    for (int i = 0; i < sizeof(jsin.js.axis); ++i) {
-        wdata.meta.axis[i] = jsin.js.axis[i];
-    }
     //sum flag
     assignSum(&wdata);
-    if (wdata.meta.head[1] != 0xbb) {
-        cout << "errh" << endl;
-    }
     int a = ms.nwrite(fd, wdata.data, sizeof(wdata.data));
-    if (a != 48)
-        cout << a << endl;
     //restore
     wdata = {};
+    initWdata = true;
 }
 
 int main() {
@@ -61,6 +54,9 @@ int main() {
 
     ControlInfo controlInfo;
     Control control;
+    JSin jsin;
+    bool gear = false;
+    bool gearButton = false;
     thread thread10(control, ref(controlInfo));
     thread10.detach();
     //union Out s{};
@@ -79,7 +75,10 @@ int main() {
     Info info;
     while (true) {
         //joystick control
-        jsin.js = controlInfo.get().js;
+        bool jsNew = controlInfo.get(jsin);
+        if (jsNew || initWdata) {
+            setJSValue(jsin, gear, gearButton);
+        }
         //read message
         unsigned char rdata;
         int n = ms.nread(fd, &rdata, 1);
@@ -150,6 +149,85 @@ int main() {
                 memcpy(wdata.meta.yAngle, &line[1], sizeof(line[0]));
             }
         }
+        if (initWdata)
+            initWdata = false;
     }
     return 0;
+}
+
+void setJSValue(JSin jsin, bool gear, bool gearButton) {
+    wdata.meta.button1[0] = jsin.js.button1;
+    wdata.meta.button2[0] = jsin.js.button2;
+    //control
+    //LT
+    char lt = jsin.js.axis[2];
+    if (lt > -90)
+        wdata.meta.button2[0] |= (1 << 3);
+    else
+        wdata.meta.button2[0] &= ~(1 << 3);
+    //RT
+    char rt = jsin.js.axis[5];
+    if (rt > -90)
+        wdata.meta.button2[0] |= (1 << 4);
+    else
+        wdata.meta.button2[0] &= ~(1 << 4);
+    //left&right
+    char lra = jsin.js.axis[6];
+    if (abs(lra) > 50)
+        wdata.meta.button2[0] |= (1 << 5);
+    else
+        wdata.meta.button2[0] &= ~(1 << 5);
+    //up&down
+    char uda = jsin.js.axis[7];
+    if (abs(uda) > 50)
+        wdata.meta.button2[0] |= (1 << 6);
+    else
+        wdata.meta.button2[0] &= ~(1 << 6);
+    //spin angle
+    char rax = jsin.js.axis[3];
+    if (rax > 90) {
+        wdata.meta.cSpinAngleASpeed[0] |= (1 << 0);
+        wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 1);
+    } else if (rax < -90) {
+        wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 0);
+        wdata.meta.cSpinAngleASpeed[0] |= (1 << 1);
+    } else {
+        wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 0);
+        wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 1);
+    }
+    //speed
+    //gear
+    if ((jsin.js.button2 & (1 << 1)) != 0) {
+        if (!gearButton)
+            gear = !gear;
+        gearButton = true;
+    } else
+        gearButton = false;
+    //run or stop
+    char lax = jsin.js.axis[0];
+    char lay = jsin.js.axis[1];
+    double speedValue = sqrt(lax * lax + lay * lay) / sqrt(2 * 127 * 127);
+    if (speedValue > 0.8) {
+        //set gear
+        if (gear) {
+            wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 2);
+            wdata.meta.cSpinAngleASpeed[0] |= (1 << 3);
+        } else {
+            wdata.meta.cSpinAngleASpeed[0] |= (1 << 2);
+            wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 3);
+        }
+        //set angle
+        if (lay > 0)
+            wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 4);
+        else
+            wdata.meta.cSpinAngleASpeed[0] |= (1 << 4);
+        if (lax > 0)
+            wdata.meta.cAngle[0] = atan(abs(lay / lax)) * 180 / M_PI;
+        else
+            wdata.meta.cAngle[0] = (M_PI - atan(abs(lay / lax))) * 180 / M_PI;
+    } else {
+        wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 2);
+        wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 3);
+    }
+
 }

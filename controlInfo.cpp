@@ -6,9 +6,15 @@
 
 using namespace std;
 
-JSin ControlInfo::get() {
+bool ControlInfo::get(JSin &res) {
     lock_guard<mutex> l(ci_mutex);
-    return this->in;
+    if (used)
+        return false;
+    else {
+        res = this->in;
+        used = true;
+        return true;
+    }
 }
 
 void ControlInfo::set(unsigned char *cin) {
@@ -16,4 +22,5 @@ void ControlInfo::set(unsigned char *cin) {
     for (int i = 0; i < sizeof(this->in.data); ++i) {
         this->in.data[i] = cin[i];
     }
+    this->used = false;
 }
