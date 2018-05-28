@@ -7,13 +7,13 @@
 int Control::operator()(ControlInfo &info) {
     //joystick
     Joystick joystick;
+    JSin in;
     bool jsCont = joystick.isFound();
     if (!jsCont) {
         printf("Joystick open failed.\n");
     }
     while (jsCont) {
         //joystick state
-        JSin in;
         JoystickEvent event;
         if (joystick.sample(&event)) {
             if (event.isButton()) {

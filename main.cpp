@@ -22,7 +22,7 @@ union Out wdata{};
 //init wdata when main thread post data too fast.
 bool initWdata = true;
 
-void setJSValue(JSin jsin, bool gear, bool gearButton);
+void setJSValue(JSin jsin, bool &gear, bool &gearButton);
 
 MySerial ms = MySerial();
 int fd;
@@ -46,9 +46,9 @@ int main() {
     signal(SIGALRM, printMes);
     memset(&tick, 0, sizeof(tick));
     tick.it_value.tv_sec = 0;
-    tick.it_value.tv_usec = 50000;
+    tick.it_value.tv_usec = 20000;
     tick.it_interval.tv_sec = 0;
-    tick.it_interval.tv_usec = 50000;
+    tick.it_interval.tv_usec = 20000;
     if (setitimer(ITIMER_REAL, &tick, NULL) < 0)
         printf("Set time fail!");
 
@@ -155,7 +155,7 @@ int main() {
     return 0;
 }
 
-void setJSValue(JSin jsin, bool gear, bool gearButton) {
+void setJSValue(JSin jsin, bool &gear, bool &gearButton) {
     wdata.meta.button1[0] = jsin.js.button1;
     wdata.meta.button2[0] = jsin.js.button2;
     //control
@@ -206,7 +206,8 @@ void setJSValue(JSin jsin, bool gear, bool gearButton) {
     //run or stop
     char lax = jsin.js.axis[0];
     char lay = jsin.js.axis[1];
-    double speedValue = sqrt(lax * lax + lay * lay) / sqrt(2 * 127 * 127);
+    //x-y axis is circle
+    double speedValue = sqrt(lax * lax + lay * lay) / 127;
     if (speedValue > 0.8) {
         //set gear
         if (gear) {
@@ -217,14 +218,19 @@ void setJSValue(JSin jsin, bool gear, bool gearButton) {
             wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 3);
         }
         //set angle
-        if (lay > 0)
+        if (lay < 0)
             wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 4);
         else
             wdata.meta.cSpinAngleASpeed[0] |= (1 << 4);
         if (lax > 0)
             wdata.meta.cAngle[0] = atan(abs(lay / lax)) * 180 / M_PI;
-        else
-            wdata.meta.cAngle[0] = (M_PI - atan(abs(lay / lax))) * 180 / M_PI;
+        else {
+            if (lax == 0)
+                wdata.meta.cAngle[0] = 90;
+            else
+                wdata.meta.cAngle[0] = (M_PI - atan(abs(lay / lax))) * 180 / M_PI;
+
+        }
     } else {
         wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 2);
         wdata.meta.cSpinAngleASpeed[0] &= ~(1 << 3);

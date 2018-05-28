@@ -66,7 +66,7 @@ struct OutMeta {
     unsigned char sum[sumNum];
 };
 union Out {
-    unsigned char data[48];
+    unsigned char data[40];
     OutMeta meta{head:{static_cast<unsigned char>(0xaa), static_cast<unsigned char>(0xbb)}};
 };
 
