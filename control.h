@@ -7,6 +7,7 @@
 
 #include "controlInfo.h"
 #include "joystick.hh"
+#include <zconf.h>
 
 class Control {
 public:

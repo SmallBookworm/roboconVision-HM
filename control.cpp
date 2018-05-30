@@ -6,16 +6,27 @@
 
 int Control::operator()(ControlInfo &info) {
     //joystick
-    Joystick joystick;
+    std::string jsPath = "/dev/input/js0";
+    Joystick *joystick = new Joystick;
     JSin in;
-    bool jsCont = joystick.isFound();
+    bool jsCont = joystick->isFound();
     if (!jsCont) {
         printf("Joystick open failed.\n");
+        delete joystick;
+    }
+    while (!jsCont) {
+        sleep(1);
+        joystick = new Joystick;
+        jsCont = joystick->isFound();
+        if (!jsCont) {
+            printf("Joystick try to open failed.\n");
+            delete joystick;
+        }
     }
     while (jsCont) {
         //joystick state
         JoystickEvent event;
-        if (joystick.sample(&event)) {
+        if (joystick->sample(&event)) {
             if (event.isButton()) {
                 //printf("Button %u is %s\n", event.number, event.value == 0 ? "up" : "down");
                 if (event.value == 1) {
@@ -39,6 +50,10 @@ int Control::operator()(ControlInfo &info) {
             }
             info.set(in.data);
         }
+        if (access(jsPath.c_str(), F_OK) != -1)
+            jsCont = false;
     }
+    info.setThreadState(false);
+    delete joystick;
     return 0;
 }

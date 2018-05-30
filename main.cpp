@@ -74,10 +74,18 @@ int main() {
     LineInfo ballTakeInfo;
     Info info;
     while (true) {
-        //joystick control
-        bool jsNew = controlInfo.get(jsin);
-        if (jsNew || initWdata) {
-            setJSValue(jsin, gear, gearButton);
+        if (controlInfo.getThreadState()) {
+            //joystick control
+            bool jsNew = controlInfo.get(jsin);
+            if (jsNew || initWdata) {
+                setJSValue(jsin, gear, gearButton);
+            }
+        } else {
+            JSin initjs;
+            jsin = initjs;
+            controlInfo.init();
+            thread thread10(control, ref(controlInfo));
+            thread10.detach();
         }
         //read message
         unsigned char rdata;

@@ -6,7 +6,7 @@
 #define ROBOCONVISIONHM_CONTROLINFO_H
 
 #include <mutex>
-#include "Info.h"
+#include "ThreadInfo.h"
 
 struct JStick {
     unsigned char button1;
@@ -14,16 +14,15 @@ struct JStick {
     unsigned char axis[8];
 };
 union JSin {
-    unsigned char data[10]{};
+    //129=-127
+    unsigned char data[10]{0, 0, 0, 0, 129, 0, 0, 129, 0, 0};
     JStick js;
 };
 
-class ControlInfo {
+class ControlInfo : public ThreadInfo{
 private:
 //joystick state
     JSin in;
-    bool used= true;
-    std::mutex ci_mutex;
 public:
     //true:success,false:fail
     bool get(JSin &res);

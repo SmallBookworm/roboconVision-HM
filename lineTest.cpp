@@ -256,9 +256,9 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                     }
                     if (tempLow1 < P[j].x) {
                         rightLine[2] = P[j].x - 1;
-                        rightLine[3] = averageLeftUpY + 2;//右上
+                        rightLine[3] =  averageRightUpY+ 2;//右上
                         leftLine[2] = tempLow1 + 1;
-                        leftLine[3] = averageRightUpY + 1;//左上
+                        leftLine[3] = averageLeftUpY  + 1;//左上
                     }
                 }
             }
