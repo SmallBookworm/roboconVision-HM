@@ -63,14 +63,15 @@ struct OutMeta {
     unsigned char button2[1];
     unsigned char cSpinAngleASpeed[1];
     unsigned char cAngle[1];
+    unsigned char device[1];
+    unsigned char placeHold2[3];
     unsigned char sum[sumNum];
 };
 union Out {
-    unsigned char data[40];
+    unsigned char data[44];
     OutMeta meta{head:{static_cast<unsigned char>(0xaa), static_cast<unsigned char>(0xbb)}};
 };
 
-static const int sumPH = sumNum+2;
 
 void assignSum(union Out *res);
 

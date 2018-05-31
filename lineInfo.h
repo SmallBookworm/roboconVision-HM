@@ -6,22 +6,16 @@
 #define LIGHTBAR_LINEINFO_H
 
 #include <mutex>
+#include "ThreadInfo.h"
 
-class LineInfo {
+class LineInfo :public ThreadInfo{
 private:
     float dModule;
     float argument;
     float relativeAngle;
-    bool used;
-    std::mutex line_mutex;
 private:
-    bool stop;
+    bool stop= false;
     std::mutex stop_mutex;
-public:
-    LineInfo() {
-        used= true;
-        stop = false;
-    }
 
 public:
     void init();

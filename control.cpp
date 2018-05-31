@@ -12,16 +12,6 @@ int Control::operator()(ControlInfo &info) {
     bool jsCont = joystick->isFound();
     if (!jsCont) {
         printf("Joystick open failed.\n");
-        delete joystick;
-    }
-    while (!jsCont) {
-        sleep(1);
-        joystick = new Joystick;
-        jsCont = joystick->isFound();
-        if (!jsCont) {
-            printf("Joystick try to open failed.\n");
-            delete joystick;
-        }
     }
     while (jsCont) {
         //joystick state
@@ -50,7 +40,7 @@ int Control::operator()(ControlInfo &info) {
             }
             info.set(in.data);
         }
-        if (access(jsPath.c_str(), F_OK) != -1)
+        if (access(jsPath.c_str(), F_OK) == -1)
             jsCont = false;
     }
     info.setThreadState(false);

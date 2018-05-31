@@ -256,9 +256,9 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                     }
                     if (tempLow1 < P[j].x) {
                         rightLine[2] = P[j].x - 1;
-                        rightLine[3] =  averageRightUpY+ 2;//右上
+                        rightLine[3] = averageRightUpY + 2;//右上
                         leftLine[2] = tempLow1 + 1;
-                        leftLine[3] = averageLeftUpY  + 1;//左上
+                        leftLine[3] = averageLeftUpY + 1;//左上
                     }
                 }
             }
@@ -453,6 +453,7 @@ int LineTest::operator()(LineInfo &info) {
     Mat srcImage;
     if (!capture.isOpened()) {
         std::cout << "fail to open video!" << std::endl;
+        info.setThreadState(false);
         return -1;
     }
 
@@ -465,7 +466,7 @@ int LineTest::operator()(LineInfo &info) {
         int size = watch(srcImage);
         //test
         //cout << size << endl;
-        if (size == 4) {
+        if (size == 4 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])) {
             info.set(info_value);
         }
         //test
@@ -475,5 +476,6 @@ int LineTest::operator()(LineInfo &info) {
         //}
         status = info.getStop();
     };
+    info.setThreadState(false);
     return 0;
 }

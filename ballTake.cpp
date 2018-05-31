@@ -225,13 +225,17 @@ vector<float> BallTake::analyse(Mat paint, vector<Vec4i> lines) {
     float rightToCenter = right_line.centerPoint(1, lines).x - BallTakeOption::WIDTH / 2;//pix
     int r = 2;
     if (pix_left_height - pix_right_height > BallTakeOption::DELTA_HEIGHT) {
-        float real_delta_x = (float) BallTakeOption::SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
-                                                     (float) BallTakeOption::SLEFTTOCENTER / (float) BallTakeOption::SPIX_LEFT_HEIGHT);//#########改过
+        float real_delta_x =
+                (float) BallTakeOption::SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
+                                                        (float) BallTakeOption::SLEFTTOCENTER /
+                                                        (float) BallTakeOption::SPIX_LEFT_HEIGHT);//#########改过
         float real_delta_d = real_left_D - BallTakeOption::SLEFTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
         //s_left_x,s_left_dis
-        float b[2] = {BallTakeOption::SREAL_HEIGHT * BallTakeOption::SLEFTTOCENTER / (float) BallTakeOption::SPIX_LEFT_HEIGHT, BallTakeOption::SLEFTD};
+        float b[2] = {
+                BallTakeOption::SREAL_HEIGHT * BallTakeOption::SLEFTTOCENTER / (float) BallTakeOption::SPIX_LEFT_HEIGHT,
+                BallTakeOption::SLEFTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -249,12 +253,15 @@ vector<float> BallTake::analyse(Mat paint, vector<Vec4i> lines) {
         all_data.push_back(y);
     }
     if (pix_left_height - pix_right_height <= BallTakeOption::DELTA_HEIGHT) {
-        float real_delta_x = (float) BallTakeOption::SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(1, lines) -
-                                                     (float) BallTakeOption::SRIGHTTOCENTER / (float) BallTakeOption::SPIX_RIGHT_HEIGHT);
+        float real_delta_x =
+                (float) BallTakeOption::SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(1, lines) -
+                                                        (float) BallTakeOption::SRIGHTTOCENTER /
+                                                        (float) BallTakeOption::SPIX_RIGHT_HEIGHT);
         float real_delta_d = real_right_D - BallTakeOption::SRIGHTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {BallTakeOption::SREAL_HEIGHT * BallTakeOption::SRIGHTTOCENTER / (float) BallTakeOption::SPIX_RIGHT_HEIGHT, BallTakeOption::SRIGHTD};
+        float b[2] = {BallTakeOption::SREAL_HEIGHT * BallTakeOption::SRIGHTTOCENTER /
+                      (float) BallTakeOption::SPIX_RIGHT_HEIGHT, BallTakeOption::SRIGHTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -382,6 +389,7 @@ int BallTake::operator()(LineInfo &info) {
     Mat srcImage;
     if (!capture.isOpened()) {
         std::cout << "fail to open video!" << std::endl;
+        info.setThreadState(false);
         return -1;
     }
 
@@ -394,7 +402,7 @@ int BallTake::operator()(LineInfo &info) {
         int size = watch(srcImage);
         //test
         //cout << size << endl;
-        if (size == 4) {
+        if (size == 4 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])) {
             info.set(info_value);
         }
         //test
@@ -404,5 +412,6 @@ int BallTake::operator()(LineInfo &info) {
         //}
         status = info.getStop();
     };
+    info.setThreadState(false);
     return 0;
 }

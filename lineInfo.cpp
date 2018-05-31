@@ -6,7 +6,7 @@
 using namespace std;
 
 int LineInfo::get(float *res) {
-    lock_guard<mutex> l(line_mutex);
+    lock_guard<mutex> l(info_mutex);
     if (used) {
         return -1;
     } else {
@@ -19,7 +19,7 @@ int LineInfo::get(float *res) {
 }
 
 void LineInfo::set(float *value) {
-    lock_guard<mutex> l(line_mutex);
+    lock_guard<mutex> l(info_mutex);
     dModule = value[0];
     argument = value[1];
     relativeAngle = value[2];
@@ -37,8 +37,10 @@ void LineInfo::setStop(bool f) {
 }
 
 void LineInfo::init() {
-    lock_guard<mutex> l(line_mutex);
+    lock_guard<mutex> l(info_mutex);
     lock_guard<mutex> s(stop_mutex);
+    lock_guard<mutex> k(ts_mutex);
     used = true;
+    threadState = true;
     stop = false;
 }

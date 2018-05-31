@@ -40,6 +40,9 @@ void printMes(int signo) {
 
 int main() {
     fd = ms.open_port(1);
+//    while (fd<0) {
+//        fd = ms.open_port(1);
+//    }
     ms.set_opt(fd, BAUDRATE, 8, 'N', 1);
 
     struct itimerval tick;
@@ -64,23 +67,23 @@ int main() {
 
     RtlFinder rtlFinder;
     RtlInfo rtlInfo;
-    bool test = true;
-    if (!test) {
-        thread thread11(rtlFinder, ref(rtlInfo));
-        thread11.detach();
-    }
+    thread thread11(rtlFinder, ref(rtlInfo));
+    thread11.detach();
 
     LineInfo lineInfo;
     LineInfo ballTakeInfo;
     Info info;
+    //1:video0,2:video1,4:joystick
+    unsigned char deviceState = 0;
     while (true) {
+        bool tJS = (access("/dev/input/js0", F_OK) != -1);
         if (controlInfo.getThreadState()) {
             //joystick control
             bool jsNew = controlInfo.get(jsin);
             if (jsNew || initWdata) {
                 setJSValue(jsin, gear, gearButton);
             }
-        } else {
+        } else if (tJS) {
             JSin initjs;
             jsin = initjs;
             controlInfo.init();
@@ -98,15 +101,22 @@ int main() {
         if (info.push(rdata) <= 0)continue;
         //wdata.meta.dataArea[0] = 0;
         //cout << "Docking mode" << (info.result.meta.flag1[0] & (1 << 1)) << endl;
+        bool tVideo1 = (access("/dev/video1", F_OK) != -1);
         //Docking mode
         if ((info.result.meta.flag1[0] & (1 << 1)) != 0) {
-            if ((state & DOCKING_MODE) == 0) {
-                state |= DOCKING_MODE;
-                lineInfo.init();
-                LineTest tracker;
-                thread thread1(tracker, ref(lineInfo));
-                thread1.detach();
-            }
+            if (tVideo1)
+                if ((state & DOCKING_MODE) == 0) {
+                    state |= DOCKING_MODE;
+                    lineInfo.init();
+                    LineTest tracker;
+                    thread thread1(tracker, ref(lineInfo));
+                    thread1.detach();
+                } else if (!lineInfo.getThreadState()) {
+                    lineInfo.init();
+                    LineTest tracker;
+                    thread thread1(tracker, ref(lineInfo));
+                    thread1.detach();
+                }
             float res[3];
             int resF = lineInfo.get(res);
             if (resF > 0) {
@@ -121,13 +131,19 @@ int main() {
         }
         //Take mode
         if ((info.result.meta.flag1[0] & (1 << 3)) != 0) {
-            if ((state & TAKE_MODE) == 0) {
-                state |= TAKE_MODE;
-                ballTakeInfo.init();
-                BallTake tracker;
-                thread thread1(tracker, ref(ballTakeInfo));
-                thread1.detach();
-            }
+            if (tVideo1)
+                if ((state & TAKE_MODE) == 0) {
+                    state |= TAKE_MODE;
+                    ballTakeInfo.init();
+                    BallTake tracker;
+                    thread thread1(tracker, ref(ballTakeInfo));
+                    thread1.detach();
+                } else if (!ballTakeInfo.getThreadState()) {
+                    ballTakeInfo.init();
+                    BallTake tracker;
+                    thread thread1(tracker, ref(ballTakeInfo));
+                    thread1.detach();
+                }
             float res[3];
             int resF = ballTakeInfo.get(res);
             if (resF > 0) {
@@ -140,23 +156,41 @@ int main() {
             state ^= TAKE_MODE;
             ballTakeInfo.setStop(true);
         }
+        bool tVideo0 = (access("/dev/video0", F_OK) != -1);
         //realtime find line
-        double rtlCoordinate[4];
-        char res = rtlInfo.get(rtlCoordinate);
-        if (res > 0) {
-            if ((res & 1) != 0) {
-                float line[] = {static_cast<float>(rtlCoordinate[2]), static_cast<float>(rtlCoordinate[0])};
-                wdata.meta.dataArea[0] |= 0x04;
-                memcpy(wdata.meta.xDis, &line[0], sizeof(line[0]));
-                memcpy(wdata.meta.xAngle, &line[1], sizeof(line[0]));
+        if (rtlInfo.getThreadState()) {
+            double rtlCoordinate[4];
+            char res = rtlInfo.get(rtlCoordinate);
+            if (res > 0) {
+                if ((res & 1) != 0) {
+                    float line[] = {static_cast<float>(rtlCoordinate[2]), static_cast<float>(rtlCoordinate[0])};
+                    wdata.meta.dataArea[0] |= 0x04;
+                    memcpy(wdata.meta.xDis, &line[0], sizeof(line[0]));
+                    memcpy(wdata.meta.xAngle, &line[1], sizeof(line[0]));
+                }
+                if ((res & 2) != 0) {
+                    float line[] = {static_cast<float>(rtlCoordinate[3]), static_cast<float>(rtlCoordinate[1])};
+                    wdata.meta.dataArea[0] |= 0x08;
+                    memcpy(wdata.meta.yDis, &line[0], sizeof(line[0]));
+                    memcpy(wdata.meta.yAngle, &line[1], sizeof(line[0]));
+                }
             }
-            if ((res & 2) != 0) {
-                float line[] = {static_cast<float>(rtlCoordinate[3]), static_cast<float>(rtlCoordinate[1])};
-                wdata.meta.dataArea[0] |= 0x08;
-                memcpy(wdata.meta.yDis, &line[0], sizeof(line[0]));
-                memcpy(wdata.meta.yAngle, &line[1], sizeof(line[0]));
-            }
+        } else if (tVideo0) {
+            rtlInfo.init();
+            thread thread11(rtlFinder, ref(rtlInfo));
+            thread11.detach();
         }
+        //device
+        if (tJS)
+            deviceState |= (1 << 2);
+        else
+            deviceState &= ~(1 << 2);
+        if (tVideo1)
+            deviceState |= (1 << 1);
+        else
+            deviceState &= ~(1 << 1);
+        wdata.meta.device[0] = deviceState;
+
         if (initWdata)
             initWdata = false;
     }
