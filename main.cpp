@@ -76,9 +76,26 @@ int main() {
     //1:video0,2:video1,4:joystick
     unsigned char deviceState = 0;
     while (true) {
+        //test device
+        bool tVideo1 = (access("/dev/video1", F_OK) != -1);
         bool tJS = (access("/dev/input/js0", F_OK) != -1);
+        bool tVideo0 = (access("/dev/video0", F_OK) != -1);
+        //device
+        if (tJS)
+            deviceState |= (1 << 2);
+        else
+            deviceState &= ~(1 << 2);
+        if (tVideo1)
+            deviceState |= (1 << 1);
+        else
+            deviceState &= ~(1 << 1);
+        if (tVideo0)
+            deviceState |= (1 << 0);
+        else
+            deviceState &= ~(1 << 0);
+        wdata.meta.device[0] = deviceState;
+        //joystick control
         if (controlInfo.getThreadState()) {
-            //joystick control
             bool jsNew = controlInfo.get(jsin);
             if (jsNew || initWdata) {
                 setJSValue(jsin, gear, gearButton);
@@ -101,7 +118,6 @@ int main() {
         if (info.push(rdata) <= 0)continue;
         //wdata.meta.dataArea[0] = 0;
         //cout << "Docking mode" << (info.result.meta.flag1[0] & (1 << 1)) << endl;
-        bool tVideo1 = (access("/dev/video1", F_OK) != -1);
         //Docking mode
         if ((info.result.meta.flag1[0] & (1 << 1)) != 0) {
             if (tVideo1)
@@ -156,7 +172,6 @@ int main() {
             state ^= TAKE_MODE;
             ballTakeInfo.setStop(true);
         }
-        bool tVideo0 = (access("/dev/video0", F_OK) != -1);
         //realtime find line
         if (rtlInfo.getThreadState()) {
             double rtlCoordinate[4];
@@ -180,23 +195,6 @@ int main() {
             thread thread11(rtlFinder, ref(rtlInfo));
             thread11.detach();
         }
-        //device
-        if (tJS)
-            deviceState |= (1 << 2);
-        else
-            deviceState &= ~(1 << 2);
-        if (tVideo1)
-            deviceState |= (1 << 1);
-        else
-            deviceState &= ~(1 << 1);
-        if (tVideo0)
-            deviceState |= (1 << 0);
-        else
-            deviceState &= ~(1 << 0);
-        wdata.meta.device[0] = deviceState;
-
-        if (initWdata)
-            initWdata = false;
     }
     return 0;
 }
