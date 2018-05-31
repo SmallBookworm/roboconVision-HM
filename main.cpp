@@ -189,6 +189,10 @@ int main() {
             deviceState |= (1 << 1);
         else
             deviceState &= ~(1 << 1);
+        if (tVideo0)
+            deviceState |= (1 << 0);
+        else
+            deviceState &= ~(1 << 0);
         wdata.meta.device[0] = deviceState;
 
         if (initWdata)
