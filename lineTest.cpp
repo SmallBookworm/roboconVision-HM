@@ -414,9 +414,9 @@ int LineTest::watch(cv::Mat src) {
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
 
-        //cout << "angle: " << data_final[0] << endl;
-        //cout << "vectAngle: " << data_final[1] << endl;
-        //cout << "vectLength: " << data_final[2] << endl;
+        cout << "angle: " << data_final[0] << endl;
+        cout << "vectAngle: " << data_final[1] << endl;
+        cout << "vectLength: " << data_final[2] << endl;
         info_value[0] = data_final[2];
         info_value[1] = data_final[1];
         info_value[2] = data_final[0];
@@ -433,10 +433,8 @@ int LineTest::watch(cv::Mat src) {
 
 int LineTest::operator()(LineInfo &info) {
     //system("v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video1");
-    VideoCapture capture(1);
+    VideoCapture capture("/dev/video1");
     //capture.open("/home/peng/下载/realse/1.avi");
-    capture.set(CV_CAP_PROP_FRAME_WIDTH, WIDTH);
-    capture.set(CV_CAP_PROP_FRAME_HEIGHT, HEIGHT);
 
     int fd = open("/dev/video1", O_RDWR);
     if (fd >= 0) {
@@ -465,9 +463,10 @@ int LineTest::operator()(LineInfo &info) {
     info.getPositionInfo(positionInfo);
     bool status = info.getStop();
     while (!status) {
-
+        if (!capture.isOpened())
+            break;
         capture >> srcImage;
-        if (!capture.isOpened() || srcImage.empty())
+        if (srcImage.empty())
             break;
         int size = watch(srcImage);
         //test
@@ -476,10 +475,10 @@ int LineTest::operator()(LineInfo &info) {
             info.set(info_value);
         }
         //test
-        //imshow("show", srcImage);
-        //if (waitKey(1) == 27) {
-        //    break;
-        //}
+//        imshow("show", srcImage);
+//        if (waitKey(1) == 27) {
+//            break;
+//        }
         status = info.getStop();
     };
     info.setThreadState(false);

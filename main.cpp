@@ -40,9 +40,10 @@ void printMes(int signo) {
 
 int main() {
     fd = ms.open_port(1);
-//    while (fd<0) {
-//        fd = ms.open_port(1);
-//    }
+    while (fd < 0) {
+        fd = ms.open_port(1);
+    }
+    bool serialOpen = true;
     ms.set_opt(fd, BAUDRATE, 8, 'N', 1);
 
     struct itimerval tick;
@@ -76,6 +77,15 @@ int main() {
     //1:video0,2:video1,4:joystick
     unsigned char deviceState = 0;
     while (true) {
+        //test serial
+        if (access("/dev/ttyUSB0", F_OK) == -1 || fd < 0) {
+            close(fd);
+            serialOpen = false;
+            continue;
+        } else if (!serialOpen) {
+            fd = ms.open_port(1);
+            serialOpen = true;
+        }
         //test device
         bool tVideo1 = (access("/dev/video1", F_OK) != -1);
         bool tJS = (access("/dev/input/js0", F_OK) != -1);
@@ -158,12 +168,12 @@ int main() {
             if (tVideo1)
                 if ((state & TAKE_MODE) == 0) {
                     state |= TAKE_MODE;
-                    ballTakeInfo.init(0,0,0);
+                    ballTakeInfo.init(0, 0, 0);
                     BallTake tracker;
                     thread thread1(tracker, ref(ballTakeInfo));
                     thread1.detach();
                 } else if (!ballTakeInfo.getThreadState()) {
-                    ballTakeInfo.init(0,0,0);
+                    ballTakeInfo.init(0, 0, 0);
                     BallTake tracker;
                     thread thread1(tracker, ref(ballTakeInfo));
                     thread1.detach();
