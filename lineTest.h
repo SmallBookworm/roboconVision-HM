@@ -39,6 +39,7 @@ private:
     void drawDetectLines(cv::Mat &image, const std::vector<cv::Vec4i> &lines, cv::Scalar &color);
 
 public:
+    short positionInfo[3];
     LinesOption all_line;
     float info_value[3]{0};
     int num = 0;

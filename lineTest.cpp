@@ -427,7 +427,6 @@ int LineTest::watch(cv::Mat src) {
 
 int LineTest::operator()(LineInfo &info) {
     //system("v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video1");
-
     VideoCapture capture(1);
     //capture.open("/home/peng/下载/realse/1.avi");
     capture.set(CV_CAP_PROP_FRAME_WIDTH, WIDTH);
@@ -457,6 +456,7 @@ int LineTest::operator()(LineInfo &info) {
         return -1;
     }
 
+    info.getPositionInfo(positionInfo);
     bool status = info.getStop();
     while (!status) {
 
