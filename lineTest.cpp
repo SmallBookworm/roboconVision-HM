@@ -225,8 +225,11 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
             float tempHigh1 = 0, tempLow1 = 0;
             for (int j = 0; j <= 3; j++)//经验值
             {
+                if (P[j].y > HEIGHT - 5 || P[j].y < 5 || P[j].x > WIDTH - 5 || P[j].x < 5) {
+                    vector<Vec4i> nulllines;
+                    return nulllines;
+                }
                 //line(src, P[j], P[(j + 1) % 4], Scalar(255), 2);
-
                 if (P[j].y > rect.center.y) {
                     if (tempHigh1 == 0) {
                         tempHigh1 = P[j].x;
@@ -262,16 +265,19 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                     }
                 }
             }
-
-            lines.push_back(leftLine);
-            lines.push_back(rightLine);
+            int testLH = leftLine[1] - leftLine[3];
+            int testRH = rightLine[1] - rightLine[3];
+            int testW = rightLine[0] - leftLine[0];
+            if (testLH > 100 && testRH > 100 && (testLH > 3 * testW) && (testRH > 3 * testW)) {
+                lines.push_back(leftLine);
+                lines.push_back(rightLine);
+            }
         }
     }
     //x from small to big
     sort(lines.begin(), lines.end(), comp);
     return lines;
 }
-
 
 vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
     LinesOption left_line;
