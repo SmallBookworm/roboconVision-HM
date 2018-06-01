@@ -36,11 +36,21 @@ void LineInfo::setStop(bool f) {
     stop = f;
 }
 
-void LineInfo::init() {
+void LineInfo::init(short x, short y, short angle) {
     lock_guard<mutex> l(info_mutex);
     lock_guard<mutex> s(stop_mutex);
     lock_guard<mutex> k(ts_mutex);
+    lock_guard<mutex> o(position_mutex);
     used = true;
     threadState = true;
     stop = false;
+    this->x = x;
+    this->y = y;
+    this->angle = angle;
+}
+
+void LineInfo::getPositionInfo(short (&value)[3]) {
+    value[0] = x;
+    value[1] = y;
+    value[2] = angle;
 }

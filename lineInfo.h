@@ -8,17 +8,20 @@
 #include <mutex>
 #include "ThreadInfo.h"
 
-class LineInfo :public ThreadInfo{
+class LineInfo : public ThreadInfo {
 private:
     float dModule;
     float argument;
     float relativeAngle;
 private:
-    bool stop= false;
+    bool stop = false;
     std::mutex stop_mutex;
-
+private:
+    //real x,y,z,angle
+    short x, y, angle;
+    std::mutex position_mutex;
 public:
-    void init();
+    void init(short x, short y, short angle);
 
     void set(float value[3]);
 
@@ -28,6 +31,8 @@ public:
     void setStop(bool f);
 
     bool getStop();
+
+    void getPositionInfo(short (&value)[3]);
 };
 
 

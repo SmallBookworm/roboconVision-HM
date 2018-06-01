@@ -146,7 +146,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
     for (int i = 0; i < contours.size(); i++) {
         Point2f P[4];
 
-        if (contours[i].size() > 70) //change according to fps
+        if (contours[i].size() > 250) //change according to fps
         {
             Vec4i leftLine;
             Vec4i rightLine;

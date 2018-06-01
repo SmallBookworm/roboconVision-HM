@@ -123,12 +123,20 @@ int main() {
             if (tVideo1)
                 if ((state & DOCKING_MODE) == 0) {
                     state |= DOCKING_MODE;
-                    lineInfo.init();
+                    short x, y, angle;
+                    memcpy(&x, &info.result.meta.positionX, sizeof(x));
+                    memcpy(&y, &info.result.meta.positionY, sizeof(x));
+                    memcpy(&angle, &info.result.meta.angle, sizeof(x));
+                    lineInfo.init(x, y, angle);
                     LineTest tracker;
                     thread thread1(tracker, ref(lineInfo));
                     thread1.detach();
                 } else if (!lineInfo.getThreadState()) {
-                    lineInfo.init();
+                    short x, y, angle;
+                    memcpy(&x, &info.result.meta.positionX, sizeof(x));
+                    memcpy(&y, &info.result.meta.positionY, sizeof(x));
+                    memcpy(&angle, &info.result.meta.angle, sizeof(x));
+                    lineInfo.init(x, y, angle);
                     LineTest tracker;
                     thread thread1(tracker, ref(lineInfo));
                     thread1.detach();
@@ -150,12 +158,12 @@ int main() {
             if (tVideo1)
                 if ((state & TAKE_MODE) == 0) {
                     state |= TAKE_MODE;
-                    ballTakeInfo.init();
+                    ballTakeInfo.init(0,0,0);
                     BallTake tracker;
                     thread thread1(tracker, ref(ballTakeInfo));
                     thread1.detach();
                 } else if (!ballTakeInfo.getThreadState()) {
-                    ballTakeInfo.init();
+                    ballTakeInfo.init(0,0,0);
                     BallTake tracker;
                     thread thread1(tracker, ref(ballTakeInfo));
                     thread1.detach();
