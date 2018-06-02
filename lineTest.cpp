@@ -463,7 +463,7 @@ int LineTest::operator()(LineInfo &info) {
     info.getPositionInfo(positionInfo);
     bool status = info.getStop();
     while (!status) {
-        if (access("/dev/video1", R_OK) == -1)
+        if (!capture.isOpened())
             break;
         capture >> srcImage;
         if (srcImage.empty())

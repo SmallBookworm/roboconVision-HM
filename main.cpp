@@ -75,8 +75,8 @@ int main() {
     unsigned char deviceState = 0;
     while (true) {
         //test serial
-        if (access("/dev/ttyUSB0", R_OK|W_OK) == -1 || fd < 0) {
-            if(serialOpen){
+        if (access("/dev/ttyUSB0", R_OK | W_OK) == -1 || fd < 0) {
+            if (serialOpen) {
                 close(fd);
                 serialOpen = false;
             }
@@ -87,7 +87,7 @@ int main() {
         }
         //test device
         bool tVideo1 = (access("/dev/video1", R_OK) != -1);
-        bool tJS = (access("/dev/input/js0", R_OK|W_OK) != -1);
+        bool tJS = (access("/dev/input/js0", R_OK | W_OK) != -1);
         bool tVideo0 = (access("/dev/video0", R_OK) != -1);
         //devicemain.cpp:92
         if (tJS)

@@ -143,7 +143,7 @@ vector<Vec4i> BallTake::findCorner(Mat dst) {
     int greaterC = 0;
     int greaterCD = 0;
     cv::findContours(dst, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-    if(contours.size()==0){
+    if (contours.size() == 0) {
         return lines;
     }
     Mat imageContours = Mat::zeros(dst.size(), CV_8UC1); //最小外接矩形画布
@@ -400,7 +400,7 @@ int BallTake::operator()(LineInfo &info) {
 
     bool status = info.getStop();
     while (!status) {
-        if (access("/dev/video1", R_OK) == -1)
+        if (!capture.isOpened())
             break;
         capture >> srcImage;
         if (srcImage.empty())

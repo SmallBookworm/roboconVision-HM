@@ -12,6 +12,8 @@ int Control::operator()(ControlInfo &info) {
     bool jsCont = joystick->isFound();
     if (!jsCont) {
         printf("Joystick open failed.\n");
+    }else{
+        printf("Joystick open!\n");
     }
     while (jsCont) {
         //joystick state
