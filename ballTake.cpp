@@ -143,6 +143,9 @@ vector<Vec4i> BallTake::findCorner(Mat dst) {
     int greaterC = 0;
     int greaterCD = 0;
     cv::findContours(dst, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+    if(contours.size()==0){
+        return lines;
+    }
     Mat imageContours = Mat::zeros(dst.size(), CV_8UC1); //最小外接矩形画布
     for (int i = 0; i < contours.size(); i++) {
         //Point2f P[4];
@@ -193,9 +196,13 @@ vector<Vec4i> BallTake::findCorner(Mat dst) {
     rightLine[2] = contours[greaterCD][rightUpD].x;
     rightLine[3] = contours[greaterCD][rightUpD].y;
 
-
-    lines.push_back(leftLine);
-    lines.push_back(rightLine);
+    int testLH = leftLine[1] - leftLine[3];
+    int testRH = rightLine[1] - rightLine[3];
+    int testW = rightLine[0] - leftLine[0];
+    if (testLH > 50 && testRH > 50 && (testLH < testW) && (testRH < testW)) {
+        lines.push_back(leftLine);
+        lines.push_back(rightLine);
+    }
     sort(lines.begin(), lines.end(), comp);
     //for (int i = 0; i < lines.size(); i++) {
     //	for (int j = 0; j < 4; j++) {
@@ -312,7 +319,7 @@ int BallTake::watch(cv::Mat src) {
     GetDiffImage(mv[1], dst);
 
     //先膨胀，后腐蚀（联通区域）
-    threshold(dst, dst, 30, 255, THRESH_BINARY);
+    threshold(dst, dst, 40, 255, THRESH_BINARY);
 
     //GaussianBlur(dst, dst, Size(3, 3), 0, 0);
     //imshow("eee",dst);
@@ -364,10 +371,8 @@ int BallTake::watch(cv::Mat src) {
 int BallTake::operator()(LineInfo &info) {
     //system("v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video1");
 
-    VideoCapture capture(1);
+    VideoCapture capture("/dev/video1");
     //capture.open("/home/peng/下载/realse/1.avi");
-    capture.set(CV_CAP_PROP_FRAME_WIDTH, BallTakeOption::WIDTH);
-    capture.set(CV_CAP_PROP_FRAME_HEIGHT, BallTakeOption::HEIGHT);
 
     int fd = open("/dev/video1", O_RDWR);
     if (fd >= 0) {
@@ -378,7 +383,7 @@ int BallTake::operator()(LineInfo &info) {
 
         struct v4l2_control ctrl1;
         ctrl1.id = V4L2_CID_EXPOSURE_ABSOLUTE;
-        ctrl1.value = 3;
+        ctrl1.value = 10000;
         ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl1);
         if (ret < 0) {
             printf("Get exposure failed (%d)\n", ret);
@@ -395,23 +400,25 @@ int BallTake::operator()(LineInfo &info) {
 
     bool status = info.getStop();
     while (!status) {
-
+        if (access("/dev/video1", R_OK) == -1)
+            break;
         capture >> srcImage;
-        if (!capture.isOpened() || srcImage.empty())
+        if (srcImage.empty())
             break;
         int size = watch(srcImage);
         //test
         //cout << size << endl;
-        if (size == 4 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])) {
+        if (size == 2 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])) {
             info.set(info_value);
         }
         //test
-        //imshow("show", srcImage);
-        //if (waitKey(1) == 27) {
-        //    break;
-        //}
+//        imshow("show", srcImage);
+//        if (waitKey(1) == 27) {
+//            break;
+//        }
         status = info.getStop();
     };
+    capture.release();
     info.setThreadState(false);
     return 0;
 }

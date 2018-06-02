@@ -463,7 +463,7 @@ int LineTest::operator()(LineInfo &info) {
     info.getPositionInfo(positionInfo);
     bool status = info.getStop();
     while (!status) {
-        if (!capture.isOpened())
+        if (access("/dev/video1", R_OK) == -1)
             break;
         capture >> srcImage;
         if (srcImage.empty())
@@ -481,6 +481,7 @@ int LineTest::operator()(LineInfo &info) {
 //        }
         status = info.getStop();
     };
+    capture.release();
     info.setThreadState(false);
     return 0;
 }

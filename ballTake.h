@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <linux/videodev2.h>
 #include<sys/ioctl.h>
+#include <zconf.h>
 
 class BallTake {
 private:
