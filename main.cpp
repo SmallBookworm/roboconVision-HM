@@ -40,9 +40,6 @@ void printMes(int signo) {
 
 int main() {
     fd = ms.open_port(1);
-    while (fd < 0) {
-        fd = ms.open_port(1);
-    }
     bool serialOpen = true;
     ms.set_opt(fd, BAUDRATE, 8, 'N', 1);
 
@@ -78,18 +75,20 @@ int main() {
     unsigned char deviceState = 0;
     while (true) {
         //test serial
-        if (access("/dev/ttyUSB0", F_OK) == -1 || fd < 0) {
-            close(fd);
-            serialOpen = false;
+        if (access("/dev/ttyUSB0", X_OK) == -1 || fd < 0) {
+            if(serialOpen){
+                close(fd);
+                serialOpen = false;
+            }
             continue;
         } else if (!serialOpen) {
             fd = ms.open_port(1);
             serialOpen = true;
         }
         //test device
-        bool tVideo1 = (access("/dev/video1", F_OK) != -1);
-        bool tJS = (access("/dev/input/js0", F_OK) != -1);
-        bool tVideo0 = (access("/dev/video0", F_OK) != -1);
+        bool tVideo1 = (access("/dev/video1", X_OK) != -1);
+        bool tJS = (access("/dev/input/js0", X_OK) != -1);
+        bool tVideo0 = (access("/dev/video0", X_OK) != -1);
         //device
         if (tJS)
             deviceState |= (1 << 2);
