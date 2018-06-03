@@ -452,6 +452,8 @@ int LineTest::operator()(LineInfo &info) {
         } else
             printf("\nGet Exposure :[%d]\n", ctrl1.value);
     }
+    //close when we will not used
+    close(fd);
 
     Mat srcImage;
     if (!capture.isOpened()) {
