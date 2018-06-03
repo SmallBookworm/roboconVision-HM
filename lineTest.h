@@ -41,7 +41,7 @@ private:
 
 public:
     short positionInfo[3];
-    LinesOption all_line;
+    LinesOption lineOption;
     float info_value[3]{0};
     int num = 0;
     std::vector<float> angleRecord;

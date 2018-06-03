@@ -19,10 +19,10 @@ bool LineTest::is_nan(double dVal) {
 
 void LineTest::GetDiffImage(Mat src1, Mat dst) {
 
-    for (int i = 0; i < HEIGHT; i++) {
+    for (int i = 0; i < lineOption.HEIGHT; i++) {
         uchar *pData1 = src1.ptr<uchar>(i);
         uchar *pData3 = dst.ptr<uchar>(i);
-        for (int j = 0; j < WIDTH; j++) {
+        for (int j = 0; j < lineOption.WIDTH; j++) {
 
             pData3[j] = pData1[j];
 
@@ -36,7 +36,7 @@ bool LineTest::comp(const Vec4i &a, const Vec4i &b) {
 }
 
 float LineTest::RadianCalculate(float rleft, float rright) {
-    float radian = asinf((float) (rleft - rright) / (float) SREAL_WIDTH);
+    float radian = asinf((float) (rleft - rright) / (float) lineOption.SREAL_WIDTH);
     return radian;
 }
 
@@ -132,7 +132,7 @@ float LineTest::yProcessor(float newNum) {
 }
 
 float LineTest::AngleCalculate(float rleft, float rright) {
-    float radian = asinf((float) (rleft - rright) / (float) SREAL_WIDTH);
+    float radian = asinf((float) (rleft - rright) / (float) lineOption.SREAL_WIDTH);
     float angle = (float) radian * 180 / (float) M_PI;
     return angle;
 }
@@ -165,7 +165,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
 
             int rightDown = 0;
             int rightDownD = 0;
-            int leftUp = WIDTH * HEIGHT;
+            int leftUp = lineOption.WIDTH * lineOption.HEIGHT;
             int leftUpD = 0;
 
             int leftDown = 0;
@@ -182,35 +182,35 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                     leftUpD = j;
                     leftUp = contours[i][j].x * contours[i][j].y;
                 }
-                if (contours[i][j].x * (HEIGHT - contours[i][j].y) > rightUp) {
+                if (contours[i][j].x * (lineOption.HEIGHT - contours[i][j].y) > rightUp) {
                     rightUpD = j;
-                    rightUp = contours[i][j].x * (HEIGHT - contours[i][j].y);
+                    rightUp = contours[i][j].x * (lineOption.HEIGHT - contours[i][j].y);
                 }
-                if ((WIDTH - contours[i][j].x) * contours[i][j].y > leftDown) {
+                if ((lineOption.WIDTH - contours[i][j].x) * contours[i][j].y > leftDown) {
                     leftDownD = j;
-                    leftDown = (WIDTH - contours[i][j].x) * contours[i][j].y;
+                    leftDown = (lineOption.WIDTH - contours[i][j].x) * contours[i][j].y;
                 }
 
             }
             //maek sure corner by average points around the found 4 points
             for (int j = 0; j < contours[i].size(); j++) {
-                if (contours[i][j].y > (contours[i][rightDownD].y - AVG) &&
-                    contours[i][j].y < (contours[i][rightDownD].y + AVG)) {
+                if (contours[i][j].y > (contours[i][rightDownD].y - lineOption.AVG) &&
+                    contours[i][j].y < (contours[i][rightDownD].y + lineOption.AVG)) {
                     averageRightDownY += contours[i][j].y;
                     averageRightDownNumY++;
                 }
-                if (contours[i][j].y > (contours[i][leftUpD].y - AVG) &&
-                    contours[i][j].y < (contours[i][leftUpD].y + AVG)) {
+                if (contours[i][j].y > (contours[i][leftUpD].y - lineOption.AVG) &&
+                    contours[i][j].y < (contours[i][leftUpD].y + lineOption.AVG)) {
                     averageLeftUpY += contours[i][j].y;
                     averageLeftUpNumY++;
                 }
-                if (contours[i][j].y > (contours[i][leftDownD].y - AVG) &&
-                    contours[i][j].y < (contours[i][leftDownD].y + AVG)) {
+                if (contours[i][j].y > (contours[i][leftDownD].y - lineOption.AVG) &&
+                    contours[i][j].y < (contours[i][leftDownD].y + lineOption.AVG)) {
                     averageLeftDownY += contours[i][j].y;
                     averageLeftDownNumY++;
                 }
-                if (contours[i][j].y > (contours[i][rightUpD].y - AVG) &&
-                    contours[i][j].y < (contours[i][rightUpD].y + AVG)) {
+                if (contours[i][j].y > (contours[i][rightUpD].y - lineOption.AVG) &&
+                    contours[i][j].y < (contours[i][rightUpD].y + lineOption.AVG)) {
                     averageRightUpY += contours[i][j].y;
                     averageRightUpNumY++;
                 }
@@ -225,7 +225,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
             float tempHigh1 = 0, tempLow1 = 0;
             for (int j = 0; j <= 3; j++)//经验值
             {
-                if (P[j].y > HEIGHT - 5 || P[j].y < 5 || P[j].x > WIDTH - 5 || P[j].x < 5) {
+                if (P[j].y > lineOption.HEIGHT - 5 || P[j].y < 5 || P[j].x > lineOption.WIDTH - 5 || P[j].x < 5) {
                     vector<Vec4i> nulllines;
                     return nulllines;
                 }
@@ -291,19 +291,19 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
     //cout << "srd" <<real_right_D << endl;
     //求角度
     float pic_angle = AngleCalculate(real_left_D, real_right_D);
-    float angle = pic_angle - SINIT_ANGLE;
+    float angle = pic_angle - lineOption.SINIT_ANGLE;
     float radian = rad(angle);
-    float leftToCenter = left_line.centerPoint(0, lines).x - WIDTH / 2;//pix
-    float rightToCenter = right_line.centerPoint(3, lines).x - WIDTH / 2;//pix
+    float leftToCenter = left_line.centerPoint(0, lines).x - lineOption.WIDTH / 2;//pix
+    float rightToCenter = right_line.centerPoint(3, lines).x - lineOption.WIDTH / 2;//pix
     int r = 2;
-    if (pix_left_height - pix_right_height > DELTA_HEIGHT) {
-        float real_delta_x = (float) SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
-                                                     (float) SLEFTTOCENTER / (float) SPIX_LEFT_HEIGHT);//#########改过
-        float real_delta_d = real_left_D - SLEFTD;
+    if (pix_left_height - pix_right_height > lineOption.DELTA_HEIGHT) {
+        float real_delta_x = (float) lineOption.SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
+                                                     (float) lineOption.SLEFTTOCENTER / (float) lineOption.SPIX_LEFT_HEIGHT);//#########改过
+        float real_delta_d = real_left_D - lineOption.SLEFTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
         //s_left_x,s_left_dis
-        float b[2] = {SREAL_HEIGHT * SLEFTTOCENTER / (float) SPIX_LEFT_HEIGHT, SLEFTD};
+        float b[2] = {lineOption.SREAL_HEIGHT * lineOption.SLEFTTOCENTER / (float) lineOption.SPIX_LEFT_HEIGHT, lineOption.SLEFTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -320,13 +320,13 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
         all_data.push_back(x);
         all_data.push_back(y);
     }
-    if (pix_left_height - pix_right_height <= DELTA_HEIGHT) {
-        float real_delta_x = (float) SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(3, lines) -
-                                                     (float) SRIGHTTOCENTER / (float) SPIX_RIGHT_HEIGHT);
-        float real_delta_d = real_right_D - SRIGHTD;
+    if (pix_left_height - pix_right_height <= lineOption.DELTA_HEIGHT) {
+        float real_delta_x = (float) lineOption.SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(3, lines) -
+                                                     (float) lineOption.SRIGHTTOCENTER / (float) lineOption.SPIX_RIGHT_HEIGHT);
+        float real_delta_d = real_right_D - lineOption.SRIGHTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {SREAL_HEIGHT * SRIGHTTOCENTER / (float) SPIX_RIGHT_HEIGHT, SRIGHTD};
+        float b[2] = {lineOption.SREAL_HEIGHT * lineOption.SRIGHTTOCENTER / (float) lineOption.SPIX_RIGHT_HEIGHT, lineOption.SRIGHTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -368,7 +368,7 @@ void LineTest::drawDetectLines(Mat &image, const vector<Vec4i> &lines, Scalar &c
 
 int LineTest::watch(cv::Mat src) {
     Mat pBinary, record, dst;
-    dst = Mat::zeros(Size(WIDTH, HEIGHT), CV_8UC1);
+    dst = Mat::zeros(Size(lineOption.WIDTH, lineOption.HEIGHT), CV_8UC1);
     vector<Mat> mv;
     vector<Vec4i> lines;
     Mat element = getStructuringElement(MORPH_RECT, Size(10, 10));
@@ -395,13 +395,13 @@ int LineTest::watch(cv::Mat src) {
         Scalar sca = Scalar(0, 0, 255);
         drawDetectLines(src, lines, sca);
         data = analyse(src, lines);
-        if (abs(data[0]) < angleThreshold) {
+        if (abs(data[0]) < lineOption.angleThreshold) {
             data[0] = 0;
         }
-        if (abs(data[1]) < xThreshold) {
+        if (abs(data[1]) < lineOption.xThreshold) {
             data[1] = 0;
         }
-        if (abs(data[2]) < yThreshold) {
+        if (abs(data[2]) < lineOption.yThreshold) {
             data[2] = 0;
         }
         data_filter1.push_back(angleProcessor(data[0]));
