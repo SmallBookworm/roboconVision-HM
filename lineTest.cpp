@@ -297,13 +297,16 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
     float rightToCenter = right_line.centerPoint(3, lines).x - lineOption.WIDTH / 2;//pix
     int r = 2;
     if (pix_left_height - pix_right_height > lineOption.DELTA_HEIGHT) {
-        float real_delta_x = (float) lineOption.SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
-                                                     (float) lineOption.SLEFTTOCENTER / (float) lineOption.SPIX_LEFT_HEIGHT);//#########改过
+        float real_delta_x =
+                (float) lineOption.SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
+                                                   (float) lineOption.SLEFTTOCENTER /
+                                                   (float) lineOption.SPIX_LEFT_HEIGHT);//#########改过
         float real_delta_d = real_left_D - lineOption.SLEFTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
         //s_left_x,s_left_dis
-        float b[2] = {lineOption.SREAL_HEIGHT * lineOption.SLEFTTOCENTER / (float) lineOption.SPIX_LEFT_HEIGHT, lineOption.SLEFTD};
+        float b[2] = {lineOption.SREAL_HEIGHT * lineOption.SLEFTTOCENTER / (float) lineOption.SPIX_LEFT_HEIGHT,
+                      lineOption.SLEFTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -321,12 +324,15 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
         all_data.push_back(y);
     }
     if (pix_left_height - pix_right_height <= lineOption.DELTA_HEIGHT) {
-        float real_delta_x = (float) lineOption.SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(3, lines) -
-                                                     (float) lineOption.SRIGHTTOCENTER / (float) lineOption.SPIX_RIGHT_HEIGHT);
+        float real_delta_x =
+                (float) lineOption.SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(3, lines) -
+                                                   (float) lineOption.SRIGHTTOCENTER /
+                                                   (float) lineOption.SPIX_RIGHT_HEIGHT);
         float real_delta_d = real_right_D - lineOption.SRIGHTD;
         float a[2] = {real_delta_x, real_delta_d};
         Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {lineOption.SREAL_HEIGHT * lineOption.SRIGHTTOCENTER / (float) lineOption.SPIX_RIGHT_HEIGHT, lineOption.SRIGHTD};
+        float b[2] = {lineOption.SREAL_HEIGHT * lineOption.SRIGHTTOCENTER / (float) lineOption.SPIX_RIGHT_HEIGHT,
+                      lineOption.SRIGHTD};
         Mat bv = Mat(2, 1, CV_32FC1, b);
         float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -463,6 +469,29 @@ int LineTest::operator()(LineInfo &info) {
     }
 
     info.getPositionInfo(positionInfo);
+    //make sure zone
+    if (positionInfo[1] > 5460) {
+        lineOption.WIDTH = 640;
+        lineOption.HEIGHT = 480;
+        lineOption.SD = 364;//标准的标准
+        lineOption.SPIX_LIGHT_HEIGHT = 188.5;//标准的标准
+        lineOption.SLEFTD = 363.037;
+        lineOption.SRIGHTD = 364.968;
+        lineOption.SPIX_LEFT_HEIGHT = 189;
+        lineOption.SPIX_RIGHT_HEIGHT = 188;
+        lineOption.DELTA_HEIGHT = lineOption.SPIX_LEFT_HEIGHT - lineOption.SPIX_RIGHT_HEIGHT;
+        lineOption.SREAL_HEIGHT = 96;    //mm
+        lineOption.SREAL_WIDTH = 93;     //mm
+        lineOption.SPIX_LIGHT_WIDTH =
+                lineOption.SPIX_LIGHT_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
+        lineOption.SINIT_ANGLE = -1.0;
+        lineOption.SLEFTTOCENTER = -76.5;//$$$$$$$$$$$$$$$$$$
+        lineOption.SRIGHTTOCENTER = 107;//$$$$$$$$$$$$$$$$$$
+        lineOption.AVG = 2;
+        lineOption.angleThreshold = 0.5;
+        lineOption.xThreshold = 0.5;
+        lineOption.yThreshold = 0.5;
+    }
     bool status = info.getStop();
     while (!status) {
         if (!capture.isOpened())
