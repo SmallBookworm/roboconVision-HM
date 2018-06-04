@@ -137,9 +137,9 @@ float BallTake::AngleCalculate(float rleft, float rright) {
     return angle;
 }
 
-vector<Vec4i> BallTake::findCorner(Mat dst) {
-    vector<vector<Point> > contours;
-    vector<Vec4i> lines;
+vector <Vec4i> BallTake::findCorner(Mat dst) {
+    vector <vector<Point>> contours;
+    vector <Vec4i> lines;
     int greaterC = 0;
     int greaterCD = 0;
     cv::findContours(dst, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
@@ -214,90 +214,118 @@ vector<Vec4i> BallTake::findCorner(Mat dst) {
 }
 
 
-vector<float> BallTake::analyse(Mat paint, vector<Vec4i> lines) {
+vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
     BallTakeOption left_line;
     BallTakeOption right_line;
+    float angle;
+    float x;
+    float y;
     vector<float> all_data;
-    float pix_left_height = left_line.pixheight(0, lines);
-    float pix_right_height = right_line.pixheight(1, lines);
-    float real_left_D = left_line.realdist(0, lines);//左灯条左边的真实距离
-    float real_right_D = right_line.realdist(1, lines);//右灯条右边的真实距离
-    //cout << "sld" <<real_left_D<<endl;
-    //cout << "srd" <<real_right_D << endl;
-    //求角度
-    float pic_angle = AngleCalculate(real_left_D, real_right_D);
-    float angle = pic_angle - BallTakeOption::SINIT_ANGLE;
-    float radian = rad(angle);
     float leftToCenter = left_line.centerPoint(0, lines).x - BallTakeOption::WIDTH / 2;//pix
     float rightToCenter = right_line.centerPoint(1, lines).x - BallTakeOption::WIDTH / 2;//pix
-    int r = 2;
-    if (pix_left_height - pix_right_height > BallTakeOption::DELTA_HEIGHT) {
-        float real_delta_x =
-                (float) BallTakeOption::SREAL_HEIGHT * ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
-                                                        (float) BallTakeOption::SLEFTTOCENTER /
-                                                        (float) BallTakeOption::SPIX_LEFT_HEIGHT);//#########改过
-        float real_delta_d = real_left_D - BallTakeOption::SLEFTD;
-        float a[2] = {real_delta_x, real_delta_d};
-        Mat av = Mat(2, 1, CV_32FC1, a);
-        //s_left_x,s_left_dis
-        float b[2] = {
-                BallTakeOption::SREAL_HEIGHT * BallTakeOption::SLEFTTOCENTER / (float) BallTakeOption::SPIX_LEFT_HEIGHT,
-                BallTakeOption::SLEFTD};
-        Mat bv = Mat(2, 1, CV_32FC1, b);
-        float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
-        Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
-        Mat cv = rotatev * bv;
-        Mat dv = bv + av - cv;
-        float lc[2] = {0, 227};//*****************************
-        Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
-        Mat locateToCamera2 = rotatev * locateToCamera1;
-        Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
-        float *data1 = locateToLocate.ptr<float>(0);
-        float x = data1[0];
-        float y = data1[1];
+    float pix_left_height = left_line.pixheight(0, lines);
+    float pix_right_height = right_line.pixheight(1, lines);
+    //判断超出的情况
+    if ((left_line.upPoint(0, lines).x == 0 && left_line.downPoint(0, lines).x < 7) ||
+        (left_line.upPoint(0, lines).x < 7 && left_line.downPoint(0, lines).x == 0))//******有参数,标志物向左出界
+    {
+        angle = 0;
+        float guessX = -BallTakeOption::SREAL_HEIGHT *
+                       (((BallTakeOption::WIDTH / 2 +
+                          (pix_right_height * BallTakeOption::SREAL_WIDTH) / (float) (2 * BallTakeOption::SREAL_HEIGHT))
+                         - right_line.centerPoint(1, lines).x)
+                        / (float) pix_right_height);
+        float guessY = 0;
         all_data.push_back(angle);
-        all_data.push_back(x);
-        all_data.push_back(y);
+        all_data.push_back(guessX);
+        all_data.push_back(guessY);
     }
-    if (pix_left_height - pix_right_height <= BallTakeOption::DELTA_HEIGHT) {
-        float real_delta_x =
-                (float) BallTakeOption::SREAL_HEIGHT * ((float) rightToCenter / (float) right_line.pixheight(1, lines) -
-                                                        (float) BallTakeOption::SRIGHTTOCENTER /
-                                                        (float) BallTakeOption::SPIX_RIGHT_HEIGHT);
-        float real_delta_d = real_right_D - BallTakeOption::SRIGHTD;
-        float a[2] = {real_delta_x, real_delta_d};
-        Mat av = Mat(2, 1, CV_32FC1, a);
-        float b[2] = {BallTakeOption::SREAL_HEIGHT * BallTakeOption::SRIGHTTOCENTER /
-                      (float) BallTakeOption::SPIX_RIGHT_HEIGHT, BallTakeOption::SRIGHTD};
-        Mat bv = Mat(2, 1, CV_32FC1, b);
-        float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
-        Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
-        Mat cv = rotatev * bv;
-        Mat dv = bv + av - cv;
-        float lc[2] = {0, 227};//*****************************
-        Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
-        Mat locateToCamera2 = rotatev * locateToCamera1;
-        Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
-        float *data1 = locateToLocate.ptr<float>(0);
-        float x = data1[0];
-        float y = data1[1];
+    if ((right_line.upPoint(0, lines).x == BallTakeOption::WIDTH &&
+         right_line.downPoint(0, lines).x > (BallTakeOption::WIDTH - 7)) ||
+        (right_line.upPoint(0, lines).x > (BallTakeOption::WIDTH - 7) &&
+         right_line.downPoint(0, lines).x == BallTakeOption::WIDTH)) {
+        angle = 0;
+        float guessX = -BallTakeOption::SREAL_HEIGHT *
+                       (((BallTakeOption::WIDTH / 2 -
+                          (pix_left_height * BallTakeOption::SREAL_WIDTH) / (float) (2 * BallTakeOption::SREAL_HEIGHT))
+                         - left_line.centerPoint(0, lines).x)
+                        / (float) pix_left_height);
+        float guessY = 0;
         all_data.push_back(angle);
-        all_data.push_back(x);
-        all_data.push_back(y);
+        all_data.push_back(guessX);
+        all_data.push_back(guessY);
+    } else//正常情况
+    {
+        float real_left_D = left_line.realdist(0, lines);//左灯条左边的真实距离
+        float real_right_D = right_line.realdist(1, lines);//右灯条右边的真实距离
+        //求角度
+        float pic_angle = AngleCalculate(real_left_D, real_right_D);
+        angle = pic_angle - BallTakeOption::SINIT_ANGLE;
+        float radian = rad(angle);
+        int r = 2;
+        if (pix_left_height - pix_right_height > BallTakeOption::DELTA_HEIGHT) {
+            float real_delta_x =
+                    (float) BallTakeOption::SREAL_HEIGHT *
+                    ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
+                     (float) BallTakeOption::SLEFTTOCENTER /
+                     (float) BallTakeOption::SPIX_LEFT_HEIGHT);//#########改过
+            float real_delta_d = real_left_D - BallTakeOption::SLEFTD;
+            float a[2] = {real_delta_x, real_delta_d};
+            Mat av = Mat(2, 1, CV_32FC1, a);
+            //s_left_x,s_left_dis
+            float b[2] = {
+                    BallTakeOption::SREAL_HEIGHT * BallTakeOption::SLEFTTOCENTER /
+                    (float) BallTakeOption::SPIX_LEFT_HEIGHT,
+                    BallTakeOption::SLEFTD};
+            Mat bv = Mat(2, 1, CV_32FC1, b);
+            float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
+            Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
+            Mat cv = rotatev * bv;
+            Mat dv = bv + av - cv;
+            float lc[2] = {0, 227};//*****************************
+            Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
+            Mat locateToCamera2 = rotatev * locateToCamera1;
+            Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
+            float *data1 = locateToLocate.ptr<float>(0);
+            x = data1[0];
+            y = data1[1];
+            all_data.push_back(angle);
+            all_data.push_back(x);
+            all_data.push_back(y);
+        }
+        if (pix_left_height - pix_right_height <= BallTakeOption::DELTA_HEIGHT) {
+            float real_delta_x =
+                    (float) BallTakeOption::SREAL_HEIGHT *
+                    ((float) rightToCenter / (float) right_line.pixheight(1, lines) -
+                     (float) BallTakeOption::SRIGHTTOCENTER /
+                     (float) BallTakeOption::SPIX_RIGHT_HEIGHT);
+            float real_delta_d = real_right_D - BallTakeOption::SRIGHTD;
+            float a[2] = {real_delta_x, real_delta_d};
+            Mat av = Mat(2, 1, CV_32FC1, a);
+            float b[2] = {BallTakeOption::SREAL_HEIGHT * BallTakeOption::SRIGHTTOCENTER /
+                          (float) BallTakeOption::SPIX_RIGHT_HEIGHT, BallTakeOption::SRIGHTD};
+            Mat bv = Mat(2, 1, CV_32FC1, b);
+            float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
+            Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
+            Mat cv = rotatev * bv;
+            Mat dv = bv + av - cv;
+            float lc[2] = {0, 227};//*****************************
+            Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
+            Mat locateToCamera2 = rotatev * locateToCamera1;
+            Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
+            float *data1 = locateToLocate.ptr<float>(0);
+            x = data1[0];
+            y = data1[1];
+            all_data.push_back(angle);
+            all_data.push_back(x);
+            all_data.push_back(y);
+        }
     }
-    /*调参数用*/
-    //    all_data.push_back(pix_left_height);
-    //    all_data.push_back(pix_right_height);
-    //    all_data.push_back(leftToCenter);
-    //    all_data.push_back(rightToCenter);
-    //namedWindow("final", 0);
-    //imshow("final", paint);
-    //waitKey(10);//&&&&&&&&&&&&&&&&&&
     return all_data;
 }
 
 
-void BallTake::drawDetectLines(Mat &image, const vector<Vec4i> &lines, Scalar &color) {
+void BallTake::drawDetectLines(Mat &image, const vector <Vec4i> &lines, Scalar &color) {
     // 将检测到的直线在图上画出来
     vector<Vec4i>::const_iterator it = lines.begin();
     while (it != lines.end()) {
@@ -311,9 +339,9 @@ void BallTake::drawDetectLines(Mat &image, const vector<Vec4i> &lines, Scalar &c
 int BallTake::watch(cv::Mat src) {
     Mat pBinary, record, dst;
     dst = Mat::zeros(Size(BallTakeOption::WIDTH, BallTakeOption::HEIGHT), CV_8UC1);
-    vector<Mat> mv;
-    vector<Vec4i> lines;
-    vector<vector<float>> dateRecord;
+    vector <Mat> mv;
+    vector <Vec4i> lines;
+    vector <vector<float>> dateRecord;
 
     split(src, mv);
     GetDiffImage(mv[1], dst);
