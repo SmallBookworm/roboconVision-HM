@@ -473,24 +473,24 @@ int LineTest::operator()(LineInfo &info) {
     if (positionInfo[1] > 5460) {
         lineOption.WIDTH = 640;
         lineOption.HEIGHT = 480;
-        lineOption.SD = 364;//标准的标准
-        lineOption.SPIX_LIGHT_HEIGHT = 188.5;//标准的标准
-        lineOption.SLEFTD = 363.037;
-        lineOption.SRIGHTD = 364.968;
-        lineOption.SPIX_LEFT_HEIGHT = 189;
-        lineOption.SPIX_RIGHT_HEIGHT = 188;
+        lineOption.SD = 425;//标准的标准
+        lineOption.SPIX_HEIGHT = 145;//标准的标准
+        lineOption.SLEFTD = 420;
+        lineOption.SRIGHTD = 425;
+        lineOption.SPIX_LEFT_HEIGHT = 147;
+        lineOption.SPIX_RIGHT_HEIGHT = 145;
         lineOption.DELTA_HEIGHT = lineOption.SPIX_LEFT_HEIGHT - lineOption.SPIX_RIGHT_HEIGHT;
-        lineOption.SREAL_HEIGHT = 96;    //mm
-        lineOption.SREAL_WIDTH = 93;     //mm
+        lineOption.SREAL_HEIGHT = 90;    //mm
+        lineOption.SREAL_WIDTH = 93;    //mm
         lineOption.SPIX_LIGHT_WIDTH =
-                lineOption.SPIX_LIGHT_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
-        lineOption.SINIT_ANGLE = -1.0;
-        lineOption.SLEFTTOCENTER = -76.5;//$$$$$$$$$$$$$$$$$$
-        lineOption.SRIGHTTOCENTER = 107;//$$$$$$$$$$$$$$$$$$
+                lineOption.SPIX_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
+        lineOption.SINIT_ANGLE = -3.5;
+        lineOption.SLEFTTOCENTER = -94;//$$$$$$$$$$$$$$$$$$
+        lineOption.SRIGHTTOCENTER = 163;//$$$$$$$$$$$$$$$$$$
         lineOption.AVG = 2;
-        lineOption.angleThreshold = 0.5;
-        lineOption.xThreshold = 0.5;
-        lineOption.yThreshold = 0.5;
+        lineOption.angleThreshold = 1;
+        lineOption.xThreshold = 1;
+        lineOption.yThreshold = 1;
     }
     bool status = info.getStop();
     while (!status) {

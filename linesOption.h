@@ -16,7 +16,7 @@ public:
     int WIDTH = 640;
     int HEIGHT = 480;
     int SD = 364;//标准的标准
-    float SPIX_LIGHT_HEIGHT = 188.5;//标准的标准
+    float SPIX_HEIGHT = 188.5;//标准的标准
     float SLEFTD = 363.037;
     float SRIGHTD = 364.968;
     float SPIX_LEFT_HEIGHT = 189;
@@ -24,7 +24,7 @@ public:
     int DELTA_HEIGHT = SPIX_LEFT_HEIGHT - SPIX_RIGHT_HEIGHT;
     int SREAL_HEIGHT = 96;    //mm
     int SREAL_WIDTH = 93;     //mm
-    float SPIX_LIGHT_WIDTH = SPIX_LIGHT_HEIGHT * ((float) SREAL_WIDTH / (float) SREAL_HEIGHT);
+    float SPIX_LIGHT_WIDTH = SPIX_HEIGHT * ((float) SREAL_WIDTH / (float) SREAL_HEIGHT);
     float SINIT_ANGLE = -1.0;
     float SLEFTTOCENTER = -76.5;//$$$$$$$$$$$$$$$$$$
     float SRIGHTTOCENTER = 107;//$$$$$$$$$$$$$$$$$$
