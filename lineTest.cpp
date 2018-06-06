@@ -312,7 +312,7 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
         Mat cv = rotatev * bv;
         Mat dv = bv + av - cv;
-        float lc[2] = {0, 227};//*****************************
+        float lc[2] = {0, 240};//*****************************
         Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
         Mat locateToCamera2 = rotatev * locateToCamera1;
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -338,7 +338,7 @@ vector<float> LineTest::analyse(Mat paint, vector<Vec4i> lines) {
         Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
         Mat cv = rotatev * bv;
         Mat dv = bv + av - cv;
-        float lc[2] = {0, 227};//*****************************
+        float lc[2] = {0, 240};//*****************************
         Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
         Mat locateToCamera2 = rotatev * locateToCamera1;
         Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -386,9 +386,7 @@ int LineTest::watch(cv::Mat src) {
     GetDiffImage(mv[1], dst);
 
     //先膨胀，后腐蚀（联通区域）
-    threshold(dst, dst, 30, 255, THRESH_BINARY);
-    cv::erode(dst, pBinary, elementC);
-    cv::dilate(pBinary, dst, elementC);
+    threshold(dst, dst, 40, 255, THRESH_BINARY);
 
     //GaussianBlur(dst, dst, Size(3, 3), 0, 0);
     //imshow("eee",dst);
@@ -416,6 +414,9 @@ int LineTest::watch(cv::Mat src) {
         float vectRadian = atan2f(data_filter1[2], data_filter1[1]);
         float vectAngle = 180 * vectRadian / (float) M_PI;
         float vectLength = sqrtf(powf(data_filter1[1], 2) + powf(data_filter1[2], 2));
+        if (vectLength == 0 && data_filter1[0] == 0) {
+            vectAngle = 0;
+        }
         data_final.push_back(data_filter1[0]);
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
@@ -473,24 +474,23 @@ int LineTest::operator()(LineInfo &info) {
     if (positionInfo[1] > 5460) {
         lineOption.WIDTH = 640;
         lineOption.HEIGHT = 480;
-        lineOption.SD = 425;//标准的标准
-        lineOption.SPIX_HEIGHT = 145;//标准的标准
-        lineOption.SLEFTD = 420;
-        lineOption.SRIGHTD = 425;
-        lineOption.SPIX_LEFT_HEIGHT = 147;
-        lineOption.SPIX_RIGHT_HEIGHT = 145;
-        lineOption.DELTA_HEIGHT = lineOption.SPIX_LEFT_HEIGHT - lineOption.SPIX_RIGHT_HEIGHT;
-        lineOption.SREAL_HEIGHT = 90;    //mm
+        lineOption.SREAL_HEIGHT = 110;//灯实际高度mm
         lineOption.SREAL_WIDTH = 93;    //mm
-        lineOption.SPIX_LIGHT_WIDTH =
-                lineOption.SPIX_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
-        lineOption.SINIT_ANGLE = -3.5;
-        lineOption.SLEFTTOCENTER = -94;//$$$$$$$$$$$$$$$$$$
-        lineOption.SRIGHTTOCENTER = 163;//$$$$$$$$$$$$$$$$$$
+        lineOption.SD = 425;//标准的标准
+        lineOption.SPIX_HEIGHT = 184;//标准的标准
+        lineOption.SLEFTD = 422.7;
+        lineOption.SRIGHTD = 427.2;
+        lineOption.SPIX_LEFT_HEIGHT = 185;
+        lineOption.SPIX_RIGHT_HEIGHT = 183;
+        lineOption.DELTA_HEIGHT = lineOption.SPIX_LEFT_HEIGHT - lineOption.SPIX_RIGHT_HEIGHT;
+        lineOption.SPIX_LIGHT_WIDTH = lineOption.SPIX_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
+        lineOption.SINIT_ANGLE = -2.8;
+        lineOption.SLEFTTOCENTER = -133.5;//$$$$$$$$$$$$$$$$$$
+        lineOption.SRIGHTTOCENTER = 25;//$$$$$$$$$$$$$$$$$$
         lineOption.AVG = 2;
         lineOption.angleThreshold = 1;
-        lineOption.xThreshold = 1;
-        lineOption.yThreshold = 1;
+        lineOption.xThreshold = 10;
+        lineOption.yThreshold = 5;
     }
     bool status = info.getStop();
     while (!status) {
