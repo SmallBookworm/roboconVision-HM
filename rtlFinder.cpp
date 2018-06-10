@@ -18,13 +18,13 @@ Mat RtlFinder::getThreshold(Mat tinput) {
     //GaussianBlur(Gray, Gray, Size(3, 3), 2, 2)
 
     //透视变换
-    float rotate[9] = {1.56581223e+00, 8.83653523e+00, -1.38263906e+03,
-                       -2.75104595e+00, 5.91734853e+00, 5.58120106e+02,
-                       1.88488768e-04, 1.00633412e-02, 1.00000000e+00};
+    float rotate[9] = {0.8464159025988004, 2.646078492334939, -550.295539322193,
+                       -1.316777110312433, 2.260156734162982, 356.661215724871,
+                       9.052569388827598e-06, 0.004419675463282232, 1};
     Mat transform = Mat(3, 3, CV_32FC1, rotate);
     Mat perspectiveImage;
     warpPerspective(binary, perspectiveImage, transform, Size(binary.cols * 3, binary.rows * 3),
-                    INTER_LINEAR | WARP_INVERSE_MAP);
+                    INTER_LINEAR);
     //截取能处理部分
 
     Mat small = perspectiveImage(Rect(200, 200, 400, 400));
@@ -246,7 +246,7 @@ bool RtlFinder::polynomial_curve_fit(std::vector<cv::Point> &key_point, int n, c
 int RtlFinder::operator()(RtlInfo &info) {
     VideoCapture capture("/dev/video0");
     //capture.open("123.avi");
-    if (!capture.isOpened()){
+    if (!capture.isOpened()) {
         info.setThreadState(false);
         return -1;
     }

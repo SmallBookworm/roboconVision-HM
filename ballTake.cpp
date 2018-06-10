@@ -137,9 +137,9 @@ float BallTake::AngleCalculate(float rleft, float rright) {
     return angle;
 }
 
-vector <Vec4i> BallTake::findCorner(Mat dst) {
-    vector <vector<Point>> contours;
-    vector <Vec4i> lines;
+vector<Vec4i> BallTake::findCorner(Mat dst) {
+    vector<vector<Point>> contours;
+    vector<Vec4i> lines;
     int greaterC = 0;
     int greaterCD = 0;
     cv::findContours(dst, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
@@ -214,7 +214,7 @@ vector <Vec4i> BallTake::findCorner(Mat dst) {
 }
 
 
-vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
+vector<float> BallTake::analyse(Mat paint, vector<Vec4i> lines) {
     BallTakeOption left_line;
     BallTakeOption right_line;
     float angle;
@@ -325,7 +325,7 @@ vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
 }
 
 
-void BallTake::drawDetectLines(Mat &image, const vector <Vec4i> &lines, Scalar &color) {
+void BallTake::drawDetectLines(Mat &image, const vector<Vec4i> &lines, Scalar &color) {
     // 将检测到的直线在图上画出来
     vector<Vec4i>::const_iterator it = lines.begin();
     while (it != lines.end()) {
@@ -339,9 +339,9 @@ void BallTake::drawDetectLines(Mat &image, const vector <Vec4i> &lines, Scalar &
 int BallTake::watch(cv::Mat src) {
     Mat pBinary, record, dst;
     dst = Mat::zeros(Size(takeOption.WIDTH, takeOption.HEIGHT), CV_8UC1);
-    vector <Mat> mv;
-    vector <Vec4i> lines;
-    vector <vector<float>> dateRecord;
+    vector<Mat> mv;
+    vector<Vec4i> lines;
+    vector<vector<float>> dateRecord;
 
     split(src, mv);
     GetDiffImage(mv[1], dst);
@@ -428,6 +428,30 @@ int BallTake::operator()(LineInfo &info) {
         return -1;
     }
 
+    short positionInfo[3];
+    info.getPositionInfo(positionInfo);
+    if (positionInfo[2] == 1) {
+        takeOption.WIDTH = 640;
+        takeOption.HEIGHT = 480;
+        takeOption.SD = 266;
+        takeOption.SLEFTD = 266;
+        takeOption.SRIGHTD = 266;
+        takeOption.SPIX_HEIGHT = 171;//灯高度（像素）
+        takeOption.SPIX_LEFT_HEIGHT = 170;//左灯高度（像素）
+        takeOption.SPIX_RIGHT_HEIGHT = 171;//右灯高度（像素）
+        takeOption.DELTA_HEIGHT = takeOption.SPIX_LEFT_HEIGHT - takeOption.SPIX_RIGHT_HEIGHT;
+        takeOption.SREAL_HEIGHT = 61;    //mm
+        takeOption.SREAL_WIDTH = 71;    //mm
+        takeOption.SPIX_LIGHT_WIDTH = takeOption.SPIX_HEIGHT *
+                                      ((float) takeOption.SREAL_WIDTH / (float) takeOption.SREAL_HEIGHT);//灯条外接矩形的宽度（像素）
+        takeOption.SINIT_ANGLE = 1.3;
+        takeOption.SLEFTTOCENTER = -58.5;//$$$$$$$$$$$$$$$$$$
+        takeOption.SRIGHTTOCENTER = 137.5;//$$$$$$$$$$$$$$$$$$
+        takeOption.AVG = 2;
+        takeOption.angleThreshold = 0.5;
+        takeOption.xThreshold = 0.5;
+        takeOption.yThreshold = 0.5;
+    }
     bool status = info.getStop();
     while (!status) {
         if (!capture.isOpened())
