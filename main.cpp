@@ -128,7 +128,7 @@ int main() {
         //wdata.meta.dataArea[0] = 0;
         //cout << "Docking mode" << (info.result.meta.flag1[0] & (1 << 1)) << endl;
         //Docking mode
-        if ((info.result.meta.flag1[0] & (1 << 1)) != 0) {
+        if (((info.result.meta.flag1[0] & (1 << 1)) != 0) || ((info.result.meta.flag1[0] & (1 << 5)) != 0)) {
             if (tVideo1)
                 if ((state & DOCKING_MODE) == 0) {
                     state |= DOCKING_MODE;
@@ -136,6 +136,10 @@ int main() {
                     memcpy(&x, &info.result.meta.positionX, sizeof(x));
                     memcpy(&y, &info.result.meta.positionY, sizeof(x));
                     memcpy(&angle, &info.result.meta.angle, sizeof(x));
+                    if ((info.result.meta.flag1[0] & (1 << 5)) != 0)
+                        angle = 1;
+                    else
+                        angle = -1;
                     lineInfo.init(x, y, angle);
                     LineTest tracker;
                     thread thread1(tracker, ref(lineInfo));
@@ -163,11 +167,14 @@ int main() {
             lineInfo.setStop(true);
         }
         //Take mode
-        if ((info.result.meta.flag1[0] & (1 << 3)) != 0) {
+        if (((info.result.meta.flag1[0] & (1 << 3)) != 0) || ((info.result.meta.flag1[0] & (1 << 4)) != 0)) {
             if (tVideo1)
                 if ((state & TAKE_MODE) == 0) {
                     state |= TAKE_MODE;
-                    ballTakeInfo.init(0, 0, 0);
+                    if ((info.result.meta.flag1[0] & (1 << 4)) != 0)
+                        ballTakeInfo.init(0, 0, 1);
+                    else
+                        ballTakeInfo.init(0, 0, -1);
                     BallTake tracker;
                     thread thread1(tracker, ref(ballTakeInfo));
                     thread1.detach();

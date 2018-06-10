@@ -17,7 +17,7 @@ private:
     bool stop = false;
     std::mutex stop_mutex;
 private:
-    //real x,y,z,angle
+    //real x,y,z,angle(-1:tz1||normal,1:tz2||golden)
     short x, y, angle;
     std::mutex position_mutex;
 public:

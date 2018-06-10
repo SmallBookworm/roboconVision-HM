@@ -471,7 +471,7 @@ int LineTest::operator()(LineInfo &info) {
 
     info.getPositionInfo(positionInfo);
     //make sure zone
-    if (positionInfo[1] > 5460) {
+    if (positionInfo[2] == 1) {
         lineOption.WIDTH = 640;
         lineOption.HEIGHT = 480;
         lineOption.SREAL_HEIGHT = 110;//灯实际高度mm
@@ -483,7 +483,8 @@ int LineTest::operator()(LineInfo &info) {
         lineOption.SPIX_LEFT_HEIGHT = 185;
         lineOption.SPIX_RIGHT_HEIGHT = 183;
         lineOption.DELTA_HEIGHT = lineOption.SPIX_LEFT_HEIGHT - lineOption.SPIX_RIGHT_HEIGHT;
-        lineOption.SPIX_LIGHT_WIDTH = lineOption.SPIX_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
+        lineOption.SPIX_LIGHT_WIDTH =
+                lineOption.SPIX_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
         lineOption.SINIT_ANGLE = -2.8;
         lineOption.SLEFTTOCENTER = -133.5;//$$$$$$$$$$$$$$$$$$
         lineOption.SRIGHTTOCENTER = 25;//$$$$$$$$$$$$$$$$$$

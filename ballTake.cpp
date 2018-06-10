@@ -19,10 +19,10 @@ bool BallTake::is_nan(double dVal) {
 
 void BallTake::GetDiffImage(Mat src1, Mat dst) {
 
-    for (int i = 0; i < BallTakeOption::HEIGHT; i++) {
+    for (int i = 0; i < takeOption.HEIGHT; i++) {
         uchar *pData1 = src1.ptr<uchar>(i);
         uchar *pData3 = dst.ptr<uchar>(i);
-        for (int j = 0; j < BallTakeOption::WIDTH; j++) {
+        for (int j = 0; j < takeOption.WIDTH; j++) {
 
             pData3[j] = pData1[j];
 
@@ -36,7 +36,7 @@ bool BallTake::comp(const Vec4i &a, const Vec4i &b) {
 }
 
 float BallTake::RadianCalculate(float rleft, float rright) {
-    float radian = asinf((float) (rleft - rright) / (float) BallTakeOption::SREAL_WIDTH);
+    float radian = asinf((float) (rleft - rright) / (float) takeOption.SREAL_WIDTH);
     return radian;
 }
 
@@ -132,7 +132,7 @@ float BallTake::yProcessor(float newNum) {
 }
 
 float BallTake::AngleCalculate(float rleft, float rright) {
-    float radian = asinf((float) (rleft - rright) / (float) BallTakeOption::SREAL_WIDTH);
+    float radian = asinf((float) (rleft - rright) / (float) takeOption.SREAL_WIDTH);
     float angle = (float) radian * 180 / (float) M_PI;
     return angle;
 }
@@ -159,7 +159,7 @@ vector <Vec4i> BallTake::findCorner(Mat dst) {
 
     int rightDown = 0;
     int rightDownD = 0;
-    int leftUp = BallTakeOption::WIDTH * BallTakeOption::HEIGHT;
+    int leftUp = takeOption.WIDTH * takeOption.HEIGHT;
     int leftUpD = 0;
 
     int leftDown = 0;
@@ -176,13 +176,13 @@ vector <Vec4i> BallTake::findCorner(Mat dst) {
             leftUpD = j;
             leftUp = contours[greaterCD][j].x * contours[greaterCD][j].y;
         }
-        if (contours[greaterCD][j].x * (BallTakeOption::HEIGHT - contours[greaterCD][j].y) > rightUp) {
+        if (contours[greaterCD][j].x * (takeOption.HEIGHT - contours[greaterCD][j].y) > rightUp) {
             rightUpD = j;
-            rightUp = contours[greaterCD][j].x * (BallTakeOption::HEIGHT - contours[greaterCD][j].y);
+            rightUp = contours[greaterCD][j].x * (takeOption.HEIGHT - contours[greaterCD][j].y);
         }
-        if ((BallTakeOption::WIDTH - contours[greaterCD][j].x) * contours[greaterCD][j].y > leftDown) {
+        if ((takeOption.WIDTH - contours[greaterCD][j].x) * contours[greaterCD][j].y > leftDown) {
             leftDownD = j;
-            leftDown = (BallTakeOption::WIDTH - contours[greaterCD][j].x) * contours[greaterCD][j].y;
+            leftDown = (takeOption.WIDTH - contours[greaterCD][j].x) * contours[greaterCD][j].y;
         }
 
     }
@@ -221,8 +221,8 @@ vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
     float x;
     float y;
     vector<float> all_data;
-    float leftToCenter = left_line.centerPoint(0, lines).x - BallTakeOption::WIDTH / 2;//pix
-    float rightToCenter = right_line.centerPoint(1, lines).x - BallTakeOption::WIDTH / 2;//pix
+    float leftToCenter = left_line.centerPoint(0, lines).x - takeOption.WIDTH / 2;//pix
+    float rightToCenter = right_line.centerPoint(1, lines).x - takeOption.WIDTH / 2;//pix
     float pix_left_height = left_line.pixheight(0, lines);
     float pix_right_height = right_line.pixheight(1, lines);
     //判断超出的情况
@@ -230,9 +230,9 @@ vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
         (left_line.upPoint(0, lines).x < 7 && left_line.downPoint(0, lines).x == 0))//******有参数,标志物向左出界
     {
         angle = 0;
-        float guessX = -BallTakeOption::SREAL_HEIGHT *
-                       (((BallTakeOption::WIDTH / 2 +
-                          (pix_right_height * BallTakeOption::SREAL_WIDTH) / (float) (2 * BallTakeOption::SREAL_HEIGHT))
+        float guessX = -takeOption.SREAL_HEIGHT *
+                       (((takeOption.WIDTH / 2 +
+                          (pix_right_height * takeOption.SREAL_WIDTH) / (float) (2 * takeOption.SREAL_HEIGHT))
                          - right_line.centerPoint(1, lines).x)
                         / (float) pix_right_height);
         float guessY = 0;
@@ -240,14 +240,14 @@ vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
         all_data.push_back(guessX);
         all_data.push_back(guessY);
     }
-    if ((right_line.upPoint(0, lines).x == BallTakeOption::WIDTH &&
-         right_line.downPoint(0, lines).x > (BallTakeOption::WIDTH - 7)) ||
-        (right_line.upPoint(0, lines).x > (BallTakeOption::WIDTH - 7) &&
-         right_line.downPoint(0, lines).x == BallTakeOption::WIDTH)) {
+    if ((right_line.upPoint(0, lines).x == takeOption.WIDTH &&
+         right_line.downPoint(0, lines).x > (takeOption.WIDTH - 7)) ||
+        (right_line.upPoint(0, lines).x > (takeOption.WIDTH - 7) &&
+         right_line.downPoint(0, lines).x == takeOption.WIDTH)) {
         angle = 0;
-        float guessX = -BallTakeOption::SREAL_HEIGHT *
-                       (((BallTakeOption::WIDTH / 2 -
-                          (pix_left_height * BallTakeOption::SREAL_WIDTH) / (float) (2 * BallTakeOption::SREAL_HEIGHT))
+        float guessX = -takeOption.SREAL_HEIGHT *
+                       (((takeOption.WIDTH / 2 -
+                          (pix_left_height * takeOption.SREAL_WIDTH) / (float) (2 * takeOption.SREAL_HEIGHT))
                          - left_line.centerPoint(0, lines).x)
                         / (float) pix_left_height);
         float guessY = 0;
@@ -260,23 +260,23 @@ vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
         float real_right_D = right_line.realdist(1, lines);//右灯条右边的真实距离
         //求角度
         float pic_angle = AngleCalculate(real_left_D, real_right_D);
-        angle = pic_angle - BallTakeOption::SINIT_ANGLE;
+        angle = pic_angle - takeOption.SINIT_ANGLE;
         float radian = rad(angle);
         int r = 2;
-        if (pix_left_height - pix_right_height > BallTakeOption::DELTA_HEIGHT) {
+        if (pix_left_height - pix_right_height > takeOption.DELTA_HEIGHT) {
             float real_delta_x =
-                    (float) BallTakeOption::SREAL_HEIGHT *
+                    (float) takeOption.SREAL_HEIGHT *
                     ((float) leftToCenter / (float) left_line.pixheight(0, lines) -
-                     (float) BallTakeOption::SLEFTTOCENTER /
-                     (float) BallTakeOption::SPIX_LEFT_HEIGHT);//#########改过
-            float real_delta_d = real_left_D - BallTakeOption::SLEFTD;
+                     (float) takeOption.SLEFTTOCENTER /
+                     (float) takeOption.SPIX_LEFT_HEIGHT);//#########改过
+            float real_delta_d = real_left_D - takeOption.SLEFTD;
             float a[2] = {real_delta_x, real_delta_d};
             Mat av = Mat(2, 1, CV_32FC1, a);
             //s_left_x,s_left_dis
             float b[2] = {
-                    BallTakeOption::SREAL_HEIGHT * BallTakeOption::SLEFTTOCENTER /
-                    (float) BallTakeOption::SPIX_LEFT_HEIGHT,
-                    BallTakeOption::SLEFTD};
+                    takeOption.SREAL_HEIGHT * takeOption.SLEFTTOCENTER /
+                    (float) takeOption.SPIX_LEFT_HEIGHT,
+                    takeOption.SLEFTD};
             Mat bv = Mat(2, 1, CV_32FC1, b);
             float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
             Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -293,17 +293,17 @@ vector<float> BallTake::analyse(Mat paint, vector <Vec4i> lines) {
             all_data.push_back(x);
             all_data.push_back(y);
         }
-        if (pix_left_height - pix_right_height <= BallTakeOption::DELTA_HEIGHT) {
+        if (pix_left_height - pix_right_height <= takeOption.DELTA_HEIGHT) {
             float real_delta_x =
-                    (float) BallTakeOption::SREAL_HEIGHT *
+                    (float) takeOption.SREAL_HEIGHT *
                     ((float) rightToCenter / (float) right_line.pixheight(1, lines) -
-                     (float) BallTakeOption::SRIGHTTOCENTER /
-                     (float) BallTakeOption::SPIX_RIGHT_HEIGHT);
-            float real_delta_d = real_right_D - BallTakeOption::SRIGHTD;
+                     (float) takeOption.SRIGHTTOCENTER /
+                     (float) takeOption.SPIX_RIGHT_HEIGHT);
+            float real_delta_d = real_right_D - takeOption.SRIGHTD;
             float a[2] = {real_delta_x, real_delta_d};
             Mat av = Mat(2, 1, CV_32FC1, a);
-            float b[2] = {BallTakeOption::SREAL_HEIGHT * BallTakeOption::SRIGHTTOCENTER /
-                          (float) BallTakeOption::SPIX_RIGHT_HEIGHT, BallTakeOption::SRIGHTD};
+            float b[2] = {takeOption.SREAL_HEIGHT * takeOption.SRIGHTTOCENTER /
+                          (float) takeOption.SPIX_RIGHT_HEIGHT, takeOption.SRIGHTD};
             Mat bv = Mat(2, 1, CV_32FC1, b);
             float rotate[4] = {cosf(-radian), -sinf(-radian), sinf(-radian), cosf(-radian)};
             Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
@@ -338,7 +338,7 @@ void BallTake::drawDetectLines(Mat &image, const vector <Vec4i> &lines, Scalar &
 
 int BallTake::watch(cv::Mat src) {
     Mat pBinary, record, dst;
-    dst = Mat::zeros(Size(BallTakeOption::WIDTH, BallTakeOption::HEIGHT), CV_8UC1);
+    dst = Mat::zeros(Size(takeOption.WIDTH, takeOption.HEIGHT), CV_8UC1);
     vector <Mat> mv;
     vector <Vec4i> lines;
     vector <vector<float>> dateRecord;
@@ -360,13 +360,13 @@ int BallTake::watch(cv::Mat src) {
         Scalar sca = Scalar(0, 0, 255);
         drawDetectLines(src, lines, sca);
         data = analyse(src, lines);
-        if (abs(data[0]) < BallTakeOption::angleThreshold) {
+        if (abs(data[0]) < takeOption.angleThreshold) {
             data[0] = 0;
         }
-        if (abs(data[1]) < BallTakeOption::xThreshold) {
+        if (abs(data[1]) < takeOption.xThreshold) {
             data[1] = 0;
         }
-        if (abs(data[2]) < BallTakeOption::yThreshold) {
+        if (abs(data[2]) < takeOption.yThreshold) {
             data[2] = 0;
         }
         data_filter1.push_back(angleProcessor(data[0]));

@@ -40,7 +40,7 @@ private:
     void drawDetectLines(cv::Mat &image, const std::vector<cv::Vec4i> &lines, cv::Scalar &color);
 
 public:
-    BallTakeOption all_line;
+    BallTakeOption takeOption;
     float info_value[3]{0};
     int num = 0;
     std::vector<float> angleRecord;
