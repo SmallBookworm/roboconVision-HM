@@ -18,16 +18,16 @@ Mat RtlFinder::getThreshold(Mat tinput) {
     //GaussianBlur(Gray, Gray, Size(3, 3), 2, 2)
 
     //透视变换
-    float rotate[9] = {0.8464159025988004, 2.646078492334939, -550.295539322193,
-                       -1.316777110312433, 2.260156734162982, 356.661215724871,
-                       9.052569388827598e-06, 0.004419675463282232, 1};
+    float rotate[9] = {9.46646146e-01, 2.96522980e+00, -5.70040261e+02,
+    -1.33485196e+00, 1.82862893e+00, 1.54887095e+02,
+    -5.83361680e-05, 5.00907325e-03, 1.00000000e+00};
     Mat transform = Mat(3, 3, CV_32FC1, rotate);
     Mat perspectiveImage;
     warpPerspective(binary, perspectiveImage, transform, Size(binary.cols * 3, binary.rows * 3),
                     INTER_LINEAR);
     //截取能处理部分
 
-    Mat small = perspectiveImage(Rect(200, 200, 400, 400));
+    Mat small = perspectiveImage(Rect(0, 50,250, 250));
     Scalar tempVal = cv::mean(small);
     float matMean = tempVal.val[0];
     threshold(small, closed, matMean + 15, 255, CV_THRESH_BINARY);//179
@@ -192,7 +192,7 @@ vector<Point> RtlFinder::FindAllMidPointsBottom(Mat Img) {
     while (flag) {
         NowMidPoint = NextMidPoint;
         AllMidPoint.push_back(NowMidPoint);
-        flag = FindNextMiddlePointBottom(Img, &NextMidPoint, NowMidPoint, 5);
+        flag = FindNextMiddlePointBottom(Img, &NextMidPoint, NowMidPoint, 2);
     }
     return AllMidPoint;
 }
@@ -208,7 +208,7 @@ vector<Point> RtlFinder::FindAllMidPointsLeft(Mat Img) {
     while (flag) {
         NowMidPoint = NextMidPoint;
         AllMidPoint.push_back(NowMidPoint);
-        flag = FindNextMiddlePointLeft(Img, &NextMidPoint, NowMidPoint, 5);
+        flag = FindNextMiddlePointLeft(Img, &NextMidPoint, NowMidPoint, 2);
     }
     return AllMidPoint;
 }
@@ -274,24 +274,31 @@ int RtlFinder::operator()(RtlInfo &info) {
         double error1 = 0;
         double dx = 0;
         unsigned char valueFlag = 0;
+        cv::Mat A;
+        cv::Mat B;
 
         if (num2 > 5) {
-            cv::Mat B;
             polynomial_curve_fit(AllMidPointsL, 1, B);//拟合直线得到 k， b
             theta2 = atan(B.at<double>(1, 0)) / M_PI * 180;
-            error2 = B.at<double>(0, 0);
-            dy = B.at<double>(1, 0) * 399 + B.at<double>(0, 0);
+            //error2 = B.at<double>(0, 0);
+            //dy = B.at<double>(1, 0) * 399 + B.at<double>(0, 0);
             //cout << "x方向 角度：" << theta2 << "    距离：" << dy << endl;
             valueFlag += 1;
         }
         if (num1 > 5) {
-            cv::Mat A;
             polynomial_curve_fit(AllMidPointsB, 1, A);//拟合直线得到 k， b
             theta1 = atan(A.at<double>(1, 0)) / M_PI * 180;
-            error1 = A.at<double>(0, 0);
-            dx = (399 - A.at<double>(0, 0)) / A.at<double>(1, 0);
+            //error1 = A.at<double>(0, 0);
+            //dx = (399 - A.at<double>(0, 0)) / A.at<double>(1, 0);
             //cout << "y方向 角度：" << theta1 << "    距离：" << dx << endl;
             valueFlag += 2;
+        }
+
+        if(valueFlag == 3)
+        {
+             dx = ((A.at<double>(0, 0) - B.at<double>(0, 0)) / (B.at<double>(1, 0) - A.at<double>(1, 0)));
+             dy = ((A.at<double>(0, 0) * B.at<double>(1, 0) - B.at<double>(0, 0) * A.at<double>(1, 0)) / (B.at<double>(1, 0) - A.at<double>(1, 0)));
+            //cout << "ddx:" << ddx << " ddy:" << ddy << endl;
         }
 
         if (valueFlag == 0) {
