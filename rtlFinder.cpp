@@ -18,16 +18,16 @@ Mat RtlFinder::getThreshold(Mat tinput) {
     //GaussianBlur(Gray, Gray, Size(3, 3), 2, 2)
 
     //透视变换
-    float rotate[9] = {9.46646146e-01, 2.96522980e+00, -5.70040261e+02,
-    -1.33485196e+00, 1.82862893e+00, 1.54887095e+02,
-    -5.83361680e-05, 5.00907325e-03, 1.00000000e+00};
+    float rotate[9] = {1.19951202e+00,  3.65550569e+00, -7.56804595e+02,
+    -1.64372027e+00,  2.73605246e+00,  2.53660358e+02,
+    -6.75785997e-05,  6.06373297e-03,  1.00000000e+00};
     Mat transform = Mat(3, 3, CV_32FC1, rotate);
     Mat perspectiveImage;
     warpPerspective(binary, perspectiveImage, transform, Size(binary.cols * 3, binary.rows * 3),
                     INTER_LINEAR);
     //截取能处理部分
 
-    Mat small = perspectiveImage(Rect(0, 50,250, 250));
+    Mat small = perspectiveImage(Rect(0, 0,300, 300));
     Scalar tempVal = cv::mean(small);
     float matMean = tempVal.val[0];
     threshold(small, closed, matMean + 15, 255, CV_THRESH_BINARY);//179
@@ -192,7 +192,7 @@ vector<Point> RtlFinder::FindAllMidPointsBottom(Mat Img) {
     while (flag) {
         NowMidPoint = NextMidPoint;
         AllMidPoint.push_back(NowMidPoint);
-        flag = FindNextMiddlePointBottom(Img, &NextMidPoint, NowMidPoint, 2);
+        flag = FindNextMiddlePointBottom(Img, &NextMidPoint, NowMidPoint, 5);
     }
     return AllMidPoint;
 }
@@ -208,7 +208,7 @@ vector<Point> RtlFinder::FindAllMidPointsLeft(Mat Img) {
     while (flag) {
         NowMidPoint = NextMidPoint;
         AllMidPoint.push_back(NowMidPoint);
-        flag = FindNextMiddlePointLeft(Img, &NextMidPoint, NowMidPoint, 2);
+        flag = FindNextMiddlePointLeft(Img, &NextMidPoint, NowMidPoint, 5);
     }
     return AllMidPoint;
 }

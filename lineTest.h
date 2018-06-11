@@ -47,6 +47,8 @@ public:
     std::vector<float> angleRecord;
     std::vector<float> xRecord;
     std::vector<float> yRecord;
+    int cornerSize=200;
+    int thresh=65;
 public:
     int watch(cv::Mat res);
 

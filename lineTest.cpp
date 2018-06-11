@@ -146,7 +146,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
     for (int i = 0; i < contours.size(); i++) {
         Point2f P[4];
 
-        if (contours[i].size() > 250) //change according to fps
+        if (contours[i].size() > cornerSize) //change according to fps
         {
             Vec4i leftLine;
             Vec4i rightLine;
@@ -236,32 +236,34 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
                     }
                     if (tempHigh1 > P[j].x) {
                         leftLine[0] = P[j].x + 1;
-                        leftLine[1] = averageLeftDownY;//左下
+                        leftLine[1] = averageLeftDownY;
                         rightLine[0] = tempHigh1 + 1;
-                        rightLine[1] = averageRightDownY;//右下
+                        rightLine[1] = averageRightDownY;
                     }
                     if (tempHigh1 < P[j].x) {
                         rightLine[0] = P[j].x + 1;
-                        rightLine[1] = averageLeftDownY;//右下
+                        rightLine[1] = averageLeftDownY;
                         leftLine[0] = tempHigh1 - 1;
-                        leftLine[1] = averageRightDownY;//左下
+                        leftLine[1] = averageRightDownY;
                     }
                 }
+
+
                 if (P[j].y < rect.center.y) {
                     if (tempLow1 == 0) {
                         tempLow1 = P[j].x;
                     }
                     if (tempLow1 > P[j].x) {
                         leftLine[2] = P[j].x + 1;
-                        leftLine[3] = averageLeftUpY + 2;//左上
+                        leftLine[3] = averageLeftUpY;
                         rightLine[2] = tempLow1 - 1;
-                        rightLine[3] = averageRightUpY + 2;//右上
+                        rightLine[3] = averageRightUpY;
                     }
                     if (tempLow1 < P[j].x) {
                         rightLine[2] = P[j].x - 1;
-                        rightLine[3] = averageRightUpY + 2;//右上
+                        rightLine[3] = averageRightUpY;
                         leftLine[2] = tempLow1 + 1;
-                        leftLine[3] = averageLeftUpY + 1;//左上
+                        leftLine[3] = averageLeftUpY;
                     }
                 }
             }
@@ -375,18 +377,18 @@ void LineTest::drawDetectLines(Mat &image, const vector<Vec4i> &lines, Scalar &c
 int LineTest::watch(cv::Mat src) {
     Mat pBinary, record, dst;
     dst = Mat::zeros(Size(lineOption.WIDTH, lineOption.HEIGHT), CV_8UC1);
-    vector <Mat> mv;
-    vector <Vec4i> lines;
+    vector<Mat> mv;
+    vector<Vec4i> lines;
     Mat element = getStructuringElement(MORPH_RECT, Size(10, 10));
     Mat elementE = getStructuringElement(MORPH_RECT, Size(9, 9));
     Mat elementC = getStructuringElement(MORPH_RECT, Size(3, 3));
-    vector <vector<float>> dateRecord;
+    vector<vector<float>> dateRecord;
 
     split(src, mv);
     GetDiffImage(mv[1], dst);
 
     //先膨胀，后腐蚀（联通区域）
-    threshold(dst, dst, 40, 255, THRESH_BINARY);
+    threshold(dst, dst, thresh, 255, THRESH_BINARY);
 
     //GaussianBlur(dst, dst, Size(3, 3), 0, 0);
     //imshow("eee",dst);
@@ -421,9 +423,9 @@ int LineTest::watch(cv::Mat src) {
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
 
-//        cout << "angle: " << data_final[0] << endl;
-//        cout << "vectAngle: " << data_final[1] << endl;
-//        cout << "vectLength: " << data_final[2] << endl;
+        cout << "angle: " << data_final[0] << endl;
+        cout << "vectAngle: " << data_final[1] << endl;
+        cout << "vectLength: " << data_final[2] << endl;
         info_value[0] = data_final[2];
         info_value[1] = data_final[1];
         info_value[2] = data_final[0];
@@ -452,7 +454,7 @@ int LineTest::operator()(LineInfo &info) {
 
         struct v4l2_control ctrl1;
         ctrl1.id = V4L2_CID_EXPOSURE_ABSOLUTE;
-        ctrl1.value = 3;
+        ctrl1.value = 1500;
         ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl1);
         if (ret < 0) {
             printf("Get exposure failed (%d)\n", ret);
@@ -472,6 +474,8 @@ int LineTest::operator()(LineInfo &info) {
     info.getPositionInfo(positionInfo);
     //make sure zone
     if (positionInfo[2] == 1) {
+        cornerSize = 250;
+        thresh = 40;
         cout << "TZ2" << endl;
         lineOption.WIDTH = 640;
         lineOption.WIDTH = 640;
