@@ -375,12 +375,12 @@ void LineTest::drawDetectLines(Mat &image, const vector<Vec4i> &lines, Scalar &c
 int LineTest::watch(cv::Mat src) {
     Mat pBinary, record, dst;
     dst = Mat::zeros(Size(lineOption.WIDTH, lineOption.HEIGHT), CV_8UC1);
-    vector<Mat> mv;
-    vector<Vec4i> lines;
+    vector <Mat> mv;
+    vector <Vec4i> lines;
     Mat element = getStructuringElement(MORPH_RECT, Size(10, 10));
     Mat elementE = getStructuringElement(MORPH_RECT, Size(9, 9));
     Mat elementC = getStructuringElement(MORPH_RECT, Size(3, 3));
-    vector<vector<float>> dateRecord;
+    vector <vector<float>> dateRecord;
 
     split(src, mv);
     GetDiffImage(mv[1], dst);
@@ -421,9 +421,9 @@ int LineTest::watch(cv::Mat src) {
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
 
-        cout << "angle: " << data_final[0] << endl;
-        cout << "vectAngle: " << data_final[1] << endl;
-        cout << "vectLength: " << data_final[2] << endl;
+//        cout << "angle: " << data_final[0] << endl;
+//        cout << "vectAngle: " << data_final[1] << endl;
+//        cout << "vectLength: " << data_final[2] << endl;
         info_value[0] = data_final[2];
         info_value[1] = data_final[1];
         info_value[2] = data_final[0];
@@ -472,26 +472,28 @@ int LineTest::operator()(LineInfo &info) {
     info.getPositionInfo(positionInfo);
     //make sure zone
     if (positionInfo[2] == 1) {
+        cout << "TZ2" << endl;
+        lineOption.WIDTH = 640;
         lineOption.WIDTH = 640;
         lineOption.HEIGHT = 480;
-        lineOption.SREAL_HEIGHT = 110;//灯实际高度mm
-        lineOption.SREAL_WIDTH = 93;    //mm
-        lineOption.SD = 425;//标准的标准
-        lineOption.SPIX_HEIGHT = 184;//标准的标准
-        lineOption.SLEFTD = 422.7;
-        lineOption.SRIGHTD = 427.2;
-        lineOption.SPIX_LEFT_HEIGHT = 185;
-        lineOption.SPIX_RIGHT_HEIGHT = 183;
+        lineOption.SD = 430;//标准的标准
+        lineOption.SPIX_HEIGHT = 175.5;//标准的标准
+        lineOption.SLEFTD = 426.5;
+        lineOption.SRIGHTD = 433.7;
+        lineOption.SPIX_LEFT_HEIGHT = 177;
+        lineOption.SPIX_RIGHT_HEIGHT = 174;
         lineOption.DELTA_HEIGHT = lineOption.SPIX_LEFT_HEIGHT - lineOption.SPIX_RIGHT_HEIGHT;
+        lineOption.SREAL_HEIGHT = 106;    //mm
+        lineOption.SREAL_WIDTH = 93;    //mm
         lineOption.SPIX_LIGHT_WIDTH =
                 lineOption.SPIX_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
-        lineOption.SINIT_ANGLE = -2.8;
-        lineOption.SLEFTTOCENTER = -133.5;//$$$$$$$$$$$$$$$$$$
-        lineOption.SRIGHTTOCENTER = 25;//$$$$$$$$$$$$$$$$$$
+        lineOption.SINIT_ANGLE = -4;
+        lineOption.SLEFTTOCENTER = -83;//$$$$$$$$$$$$$$$$$$
+        lineOption.SRIGHTTOCENTER = 74;//$$$$$$$$$$$$$$$$$$
         lineOption.AVG = 2;
         lineOption.angleThreshold = 1;
-        lineOption.xThreshold = 10;
-        lineOption.yThreshold = 5;
+        lineOption.xThreshold = 7;
+        lineOption.yThreshold = 2;
     }
     bool status = info.getStop();
     while (!status) {
