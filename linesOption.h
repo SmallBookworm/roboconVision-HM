@@ -15,7 +15,7 @@ class LinesOption {
 public:
     int WIDTH = 640;
     int HEIGHT = 480;
-    int SREAL_HEIGHT = 89;    //灯实际高度mm
+    int SREAL_HEIGHT = 113;    //灯实际高度mm
     int SREAL_WIDTH = 68;    //mm
     int SD = 511;//标准的标准
     float SPIX_HEIGHT = 159;//标准的标准
