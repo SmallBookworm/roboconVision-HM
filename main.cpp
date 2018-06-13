@@ -92,16 +92,25 @@ int main() {
         //devicemain.cpp:92
         if (tJS)
             deviceState |= (1 << 2);
-        else
+        else {
             deviceState &= ~(1 << 2);
+            cout << "joystick is not online" << endl;
+        }
+
         if (tVideo1)
             deviceState |= (1 << 1);
-        else
+        else {
             deviceState &= ~(1 << 1);
+            cout << "Video1 is not online" << endl;
+        }
+
         if (tVideo0)
             deviceState |= (1 << 0);
-        else
+        else {
             deviceState &= ~(1 << 0);
+            cout << "Video0 is not online" << endl;
+        }
+
         wdata.meta.device[0] = deviceState;
         //joystick control
         if (controlInfo.getThreadState()) {
