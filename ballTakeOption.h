@@ -30,9 +30,9 @@ public:
     float SLEFTTOCENTER = -75;//$$$$$$$$$$$$$$$$$$
     float SRIGHTTOCENTER = 132;//$$$$$$$$$$$$$$$$$$
     int AVG = 2;
-    float angleThreshold = 0.5;
-    float xThreshold = 0.5;
-    float yThreshold = 0.5;
+    float angleThreshold = 1;
+    float xThreshold = 5;
+    float yThreshold = 5;
 public:
     cv::Point2f upPoint(int i, std::vector<cv::Vec4i> &a);
 

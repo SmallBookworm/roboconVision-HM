@@ -416,9 +416,13 @@ int LineTest::watch(cv::Mat src) {
         float vectRadian = atan2f(data_filter1[2], data_filter1[1]);
         float vectAngle = 180 * vectRadian / (float) M_PI;
         float vectLength = sqrtf(powf(data_filter1[1], 2) + powf(data_filter1[2], 2));
+        if (abs(vectLength) < 10) {
+            vectLength = 0;
+        }
         if (vectLength == 0 && data_filter1[0] == 0) {
             vectAngle = 0;
         }
+
         data_final.push_back(data_filter1[0]);
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
@@ -441,6 +445,7 @@ int LineTest::watch(cv::Mat src) {
 }
 
 int LineTest::operator()(LineInfo &info) {
+    cout << "dock" << endl;
     //system("v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video1");
     VideoCapture capture("/dev/video1");
     //capture.open("/home/peng/下载/realse/1.avi");
@@ -476,8 +481,7 @@ int LineTest::operator()(LineInfo &info) {
     if (positionInfo[2] == 1) {
         cornerSize = 250;
         thresh = 40;
-        maxHeight=100;
-        cout << "TZ2" << endl;
+        maxHeight = 100;
         lineOption.WIDTH = 640;
         lineOption.WIDTH = 640;
         lineOption.HEIGHT = 480;

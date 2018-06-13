@@ -375,6 +375,9 @@ int BallTake::watch(cv::Mat src) {
         float vectRadian = atan2f(data_filter1[2], data_filter1[1]);
         float vectAngle = 180 * vectRadian / (float) M_PI;
         float vectLength = sqrtf(powf(data_filter1[1], 2) + powf(data_filter1[2], 2));
+        if (vectLength < 10) {
+            vectLength = 0;
+        }
         data_final.push_back(data_filter1[0]);
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
@@ -397,6 +400,7 @@ int BallTake::watch(cv::Mat src) {
 }
 
 int BallTake::operator()(LineInfo &info) {
+    cout << "take" << endl;
     //system("v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video1");
 
     VideoCapture capture("/dev/video1");
@@ -448,9 +452,9 @@ int BallTake::operator()(LineInfo &info) {
         takeOption.SLEFTTOCENTER = -58.5;//$$$$$$$$$$$$$$$$$$
         takeOption.SRIGHTTOCENTER = 137.5;//$$$$$$$$$$$$$$$$$$
         takeOption.AVG = 2;
-        takeOption.angleThreshold = 0.5;
-        takeOption.xThreshold = 0.5;
-        takeOption.yThreshold = 0.5;
+        takeOption.angleThreshold = 1;
+        takeOption.xThreshold = 5;
+        takeOption.yThreshold = 5;
     }
     bool status = info.getStop();
     while (!status) {
