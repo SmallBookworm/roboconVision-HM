@@ -17,11 +17,11 @@ public:
     int WIDTH = 640;
     int HEIGHT = 480;
     int SD = 242;
-    int SLEFTD = 242;
-    int SRIGHTD = 242;
+    float SLEFTD = 242;
+    float SRIGHTD = 242;
     int SPIX_HEIGHT = 180;//灯高度（像素）
     int SPIX_LEFT_HEIGHT = 181;//左灯高度（像素）
-    int SPIX_RIGHT_HEIGHT = 180;//右灯高度（像素）
+    float SPIX_RIGHT_HEIGHT = 180;//右灯高度（像素）
     int DELTA_HEIGHT = SPIX_LEFT_HEIGHT - SPIX_RIGHT_HEIGHT;
     int SREAL_HEIGHT = 60;    //mm
     int SREAL_WIDTH = 70;    //mm
