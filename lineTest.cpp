@@ -270,7 +270,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
             int testLH = leftLine[1] - leftLine[3];
             int testRH = rightLine[1] - rightLine[3];
             int testW = rightLine[0] - leftLine[0];
-            if (testLH > maxHeight && testRH > maxHeight && (testLH > 4 * testW) && (testRH > 4 * testW)) {
+            if (testLH > maxHeight && testRH > maxHeight && (testLH > 5 * testW) && (testRH > 5 * testW)) {
                 lines.push_back(leftLine);
                 lines.push_back(rightLine);
             }
@@ -479,6 +479,7 @@ int LineTest::operator()(LineInfo &info) {
     info.getPositionInfo(positionInfo);
     //make sure zone
     if (positionInfo[2] == 1) {
+        cout << "TZ2" << endl;
         cornerSize = 250;
         thresh = 40;
         maxHeight = 100;

@@ -199,7 +199,7 @@ vector<Vec4i> BallTake::findCorner(Mat dst) {
     int testLH = leftLine[1] - leftLine[3];
     int testRH = rightLine[1] - rightLine[3];
     int testW = rightLine[0] - leftLine[0];
-    if (testLH > 50 && testRH > 50 && (testLH < testW) && (testRH < testW)) {
+    if (testLH > 30 && testRH > 30 && (testLH < testW) && (testRH < testW)) {
         lines.push_back(leftLine);
         lines.push_back(rightLine);
     }
@@ -382,9 +382,9 @@ int BallTake::watch(cv::Mat src) {
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
 
-//        cout << "angle: " << data_final[0] << endl;
-//        cout << "vectAngle: " << data_final[1] << endl;
-//        cout << "vectLength: " << data_final[2] << endl;
+        cout << "angle: " << data_final[0] << endl;
+        cout << "vectAngle: " << data_final[1] << endl;
+        cout << "vectLength: " << data_final[2] << endl;
         info_value[0] = data_final[2];
         info_value[1] = data_final[1];
         info_value[2] = data_final[0];
