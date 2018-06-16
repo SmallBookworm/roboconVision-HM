@@ -13,21 +13,22 @@
 
 class LinesOption {
 public:
+    //tz2
     int WIDTH = 640;
     int HEIGHT = 480;
-    int SREAL_HEIGHT = 113;    //灯实际高度mm
-    int SREAL_WIDTH = 68;    //mm
-    int SD = 511;//标准的标准
-    float SPIX_HEIGHT = 158;//标准的标准
-    float SLEFTD = 511;
-    float SRIGHTD = 511;
-    float SPIX_LEFT_HEIGHT = 158;
-    float SPIX_RIGHT_HEIGHT = 158;
+    int SREAL_HEIGHT = 106;    //灯实际高度mm
+    int SREAL_WIDTH = 93;    //mm
+    int SD = 425;//标准的标准
+    float SPIX_HEIGHT = 179;//标准的标准
+    float SLEFTD = 425;
+    float SRIGHTD = 427.4;
+    float SPIX_LEFT_HEIGHT = 179;
+    float SPIX_RIGHT_HEIGHT = 178;
     int DELTA_HEIGHT = SPIX_LEFT_HEIGHT - SPIX_RIGHT_HEIGHT;
     float SPIX_LIGHT_WIDTH = SPIX_HEIGHT * ((float) SREAL_WIDTH / (float) SREAL_HEIGHT);
-    float SINIT_ANGLE = 0;
-    float SLEFTTOCENTER = -13;//$$$$$$$$$$$$$$$$$$
-    float SRIGHTTOCENTER = 80;//$$$$$$$$$$$$$$$$$$
+    float SINIT_ANGLE = -1.2;
+    float SLEFTTOCENTER = -87;//$$$$$$$$$$$$$$$$$$
+    float SRIGHTTOCENTER = 71;//$$$$$$$$$$$$$$$$$$
     int AVG = 2;
     float angleThreshold = 1;
     float xThreshold = 7;

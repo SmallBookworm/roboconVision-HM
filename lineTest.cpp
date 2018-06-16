@@ -478,8 +478,8 @@ int LineTest::operator()(LineInfo &info) {
 
     info.getPositionInfo(positionInfo);
     //make sure zone
-    if (positionInfo[2] == 1) {
-        cout << "TZ2" << endl;
+    if (positionInfo[2] == -1) {
+        cout << "TZ1" << endl;
         cornerSize = 250;
         thresh = 40;
         maxHeight = 100;
