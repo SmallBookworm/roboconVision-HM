@@ -14,6 +14,7 @@
 
 class BallTakeOption {
 public:
+    //normal ball
     int WIDTH = 640;
     int HEIGHT = 480;
     int SD = 534;

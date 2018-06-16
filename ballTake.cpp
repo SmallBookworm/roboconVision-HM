@@ -435,22 +435,23 @@ int BallTake::operator()(LineInfo &info) {
     short positionInfo[3];
     info.getPositionInfo(positionInfo);
     if (positionInfo[2] == 1) {
+        //golden ball
         takeOption.WIDTH = 640;
         takeOption.HEIGHT = 480;
-        takeOption.SD = 534;
-        takeOption.SLEFTD = 534;
-        takeOption.SRIGHTD = 534;
-        takeOption.SPIX_HEIGHT = 161;//灯高度（像素）
-        takeOption.SPIX_LEFT_HEIGHT = 161;//左灯高度（像素）
-        takeOption.SPIX_RIGHT_HEIGHT = 161;//右灯高度（像素）
+        takeOption.SD = 384;
+        takeOption.SLEFTD = 384;
+        takeOption.SRIGHTD = 384;
+        takeOption.SPIX_HEIGHT = 116;//灯高度（像素）
+        takeOption.SPIX_LEFT_HEIGHT = 116;//左灯高度（像素）
+        takeOption.SPIX_RIGHT_HEIGHT = 116;//右灯高度（像素）
         takeOption.DELTA_HEIGHT = takeOption.SPIX_LEFT_HEIGHT - takeOption.SPIX_RIGHT_HEIGHT;
         takeOption.SREAL_HEIGHT = 120;    //mm
         takeOption.SREAL_WIDTH = 60;    //mm
         takeOption.SPIX_LIGHT_WIDTH = takeOption.SPIX_HEIGHT *
                                       ((float) takeOption.SREAL_WIDTH / (float) takeOption.SREAL_HEIGHT);//灯条外接矩形的宽度（像素）
         takeOption.SINIT_ANGLE = -0.4;
-        takeOption.SLEFTTOCENTER = -11;//$$$$$$$$$$$$$$$$$$
-        takeOption.SRIGHTTOCENTER = 68;//$$$$$$$$$$$$$$$$$$
+        takeOption.SLEFTTOCENTER = -7.9;//$$$$$$$$$$$$$$$$$$
+        takeOption.SRIGHTTOCENTER = 48.9;//$$$$$$$$$$$$$$$$$$
         takeOption.AVG = 2;
         takeOption.angleThreshold = 1;
         takeOption.xThreshold = 5;
