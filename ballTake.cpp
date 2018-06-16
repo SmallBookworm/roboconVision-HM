@@ -199,7 +199,7 @@ vector<Vec4i> BallTake::findCorner(Mat dst) {
     int testLH = leftLine[1] - leftLine[3];
     int testRH = rightLine[1] - rightLine[3];
     int testW = rightLine[0] - leftLine[0];
-    if (testLH > 30 && testRH > 30 && (testLH < testW) && (testRH < testW)) {
+    if (testLH > 80 && testRH > 80 && (testLH > 1.5 * testW) && (testRH > 1.5 * testW)) {
         lines.push_back(leftLine);
         lines.push_back(rightLine);
     }
@@ -282,7 +282,7 @@ vector<float> BallTake::analyse(Mat paint, vector<Vec4i> lines) {
             Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
             Mat cv = rotatev * bv;
             Mat dv = bv + av - cv;
-            float lc[2] = {0, 227};//*****************************
+            float lc[2] = {0, 240};//*****************************
             Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
             Mat locateToCamera2 = rotatev * locateToCamera1;
             Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -309,7 +309,7 @@ vector<float> BallTake::analyse(Mat paint, vector<Vec4i> lines) {
             Mat rotatev = Mat(2, 2, CV_32FC1, rotate);
             Mat cv = rotatev * bv;
             Mat dv = bv + av - cv;
-            float lc[2] = {0, 227};//*****************************
+            float lc[2] = {0, 240};//*****************************
             Mat locateToCamera1 = Mat(2, 1, CV_32FC1, lc);
             Mat locateToCamera2 = rotatev * locateToCamera1;
             Mat locateToLocate = locateToCamera1 + dv - locateToCamera2;
@@ -437,20 +437,20 @@ int BallTake::operator()(LineInfo &info) {
     if (positionInfo[2] == 1) {
         takeOption.WIDTH = 640;
         takeOption.HEIGHT = 480;
-        takeOption.SD = 266;
-        takeOption.SLEFTD = 266;
-        takeOption.SRIGHTD = 266;
-        takeOption.SPIX_HEIGHT = 171;//灯高度（像素）
-        takeOption.SPIX_LEFT_HEIGHT = 170;//左灯高度（像素）
-        takeOption.SPIX_RIGHT_HEIGHT = 171;//右灯高度（像素）
+        takeOption.SD = 534;
+        takeOption.SLEFTD = 534;
+        takeOption.SRIGHTD = 534;
+        takeOption.SPIX_HEIGHT = 161;//灯高度（像素）
+        takeOption.SPIX_LEFT_HEIGHT = 161;//左灯高度（像素）
+        takeOption.SPIX_RIGHT_HEIGHT = 161;//右灯高度（像素）
         takeOption.DELTA_HEIGHT = takeOption.SPIX_LEFT_HEIGHT - takeOption.SPIX_RIGHT_HEIGHT;
-        takeOption.SREAL_HEIGHT = 61;    //mm
-        takeOption.SREAL_WIDTH = 71;    //mm
+        takeOption.SREAL_HEIGHT = 120;    //mm
+        takeOption.SREAL_WIDTH = 60;    //mm
         takeOption.SPIX_LIGHT_WIDTH = takeOption.SPIX_HEIGHT *
                                       ((float) takeOption.SREAL_WIDTH / (float) takeOption.SREAL_HEIGHT);//灯条外接矩形的宽度（像素）
-        takeOption.SINIT_ANGLE = 1.3;
-        takeOption.SLEFTTOCENTER = -58.5;//$$$$$$$$$$$$$$$$$$
-        takeOption.SRIGHTTOCENTER = 137.5;//$$$$$$$$$$$$$$$$$$
+        takeOption.SINIT_ANGLE = -0.4;
+        takeOption.SLEFTTOCENTER = -11;//$$$$$$$$$$$$$$$$$$
+        takeOption.SRIGHTTOCENTER = 68;//$$$$$$$$$$$$$$$$$$
         takeOption.AVG = 2;
         takeOption.angleThreshold = 1;
         takeOption.xThreshold = 5;

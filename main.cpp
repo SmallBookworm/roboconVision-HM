@@ -60,6 +60,7 @@ int main() {
     bool gearButton = false;
     thread thread10(control, ref(controlInfo));
     thread10.detach();
+    int jsCount = 0;
     //union Out s{};
     //cout << s.data << " length:" << sizeof(s.data) << endl;
 
@@ -87,14 +88,17 @@ int main() {
         }
         //test device
         bool tVideo1 = (access("/dev/video1", R_OK) != -1);
-        bool tJS = (access("/dev/input/js0", R_OK | W_OK) != -1);
+        bool tJS = (access("/dev/input/js0", R_OK) != -1);
         bool tVideo0 = (access("/dev/video0", R_OK) != -1);
         //devicemain.cpp:92
         if (tJS)
             deviceState |= (1 << 2);
-        else {
+        else if (jsCount > 10) {
             deviceState &= ~(1 << 2);
             cout << "joystick is not online" << endl;
+            jsCount = 0;
+        } else {
+            jsCount++;
         }
 
         if (tVideo1)
