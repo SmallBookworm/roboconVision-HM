@@ -480,26 +480,25 @@ int LineTest::operator()(LineInfo &info) {
     //make sure zone
     if (positionInfo[2] == -1) {
         cout << "TZ1" << endl;
-        cornerSize = 250;
-        thresh = 40;
-        maxHeight = 100;
-        lineOption.WIDTH = 640;
+        cornerSize = 120;
+        thresh = 57;
+        maxHeight = 80;
         lineOption.WIDTH = 640;
         lineOption.HEIGHT = 480;
-        lineOption.SD = 430;//标准的标准
-        lineOption.SPIX_HEIGHT = 175.5;//标准的标准
-        lineOption.SLEFTD = 426.5;
-        lineOption.SRIGHTD = 433.7;
-        lineOption.SPIX_LEFT_HEIGHT = 177;
-        lineOption.SPIX_RIGHT_HEIGHT = 174;
+        lineOption.SD = 566;//标准的标准
+        lineOption.SPIX_HEIGHT = 143;//标准的标准
+        lineOption.SLEFTD = 566;
+        lineOption.SRIGHTD = 566;
+        lineOption.SPIX_LEFT_HEIGHT = 143;
+        lineOption.SPIX_RIGHT_HEIGHT = 143;
         lineOption.DELTA_HEIGHT = lineOption.SPIX_LEFT_HEIGHT - lineOption.SPIX_RIGHT_HEIGHT;
-        lineOption.SREAL_HEIGHT = 106;    //mm
-        lineOption.SREAL_WIDTH = 93;    //mm
+        lineOption.SREAL_HEIGHT = 113;    //mm
+        lineOption.SREAL_WIDTH = 68;    //mm
         lineOption.SPIX_LIGHT_WIDTH =
                 lineOption.SPIX_HEIGHT * ((float) lineOption.SREAL_WIDTH / (float) lineOption.SREAL_HEIGHT);
-        lineOption.SINIT_ANGLE = -4;
-        lineOption.SLEFTTOCENTER = -83;//$$$$$$$$$$$$$$$$$$
-        lineOption.SRIGHTTOCENTER = 74;//$$$$$$$$$$$$$$$$$$
+        lineOption.SINIT_ANGLE = 0;
+        lineOption.SLEFTTOCENTER = -67;//$$$$$$$$$$$$$$$$$$
+        lineOption.SRIGHTTOCENTER = 18;//$$$$$$$$$$$$$$$$$$
         lineOption.AVG = 2;
         lineOption.angleThreshold = 1;
         lineOption.xThreshold = 7;

@@ -64,10 +64,10 @@ int main() {
     //union Out s{};
     //cout << s.data << " length:" << sizeof(s.data) << endl;
 
-    RtlFinder rtlFinder;
-    RtlInfo rtlInfo;
-    thread thread11(rtlFinder, ref(rtlInfo));
-    thread11.detach();
+//    RtlFinder rtlFinder;
+//    RtlInfo rtlInfo;
+//    thread thread11(rtlFinder, ref(rtlInfo));
+//    thread11.detach();
 
     LineInfo lineInfo;
     LineInfo ballTakeInfo;
@@ -105,7 +105,7 @@ int main() {
             deviceState |= (1 << 1);
         else {
             deviceState &= ~(1 << 1);
-            cout << "Video1 is not online" << endl;
+            //cout << "Video1 is not online" << endl;
         }
 
         if (tVideo0)
@@ -210,28 +210,28 @@ int main() {
             ballTakeInfo.setStop(true);
         }
         //realtime find line
-        if (rtlInfo.getThreadState()) {
-            double rtlCoordinate[4];
-            char res = rtlInfo.get(rtlCoordinate);
-            if (res > 0) {
-                if ((res & 1) != 0) {
-                    float line[] = {static_cast<float>(rtlCoordinate[2]), static_cast<float>(rtlCoordinate[0])};
-                    wdata.meta.dataArea[0] |= 0x04;
-                    memcpy(wdata.meta.xDis, &line[0], sizeof(line[0]));
-                    memcpy(wdata.meta.xAngle, &line[1], sizeof(line[0]));
-                }
-                if ((res & 2) != 0) {
-                    float line[] = {static_cast<float>(rtlCoordinate[3]), static_cast<float>(rtlCoordinate[1])};
-                    wdata.meta.dataArea[0] |= 0x08;
-                    memcpy(wdata.meta.yDis, &line[0], sizeof(line[0]));
-                    memcpy(wdata.meta.yAngle, &line[1], sizeof(line[0]));
-                }
-            }
-        } else if (tVideo0) {
-            rtlInfo.init();
-            thread thread11(rtlFinder, ref(rtlInfo));
-            thread11.detach();
-        }
+//        if (rtlInfo.getThreadState()) {
+//            double rtlCoordinate[4];
+//            char res = rtlInfo.get(rtlCoordinate);
+//            if (res > 0) {
+//                if ((res & 1) != 0) {
+//                    float line[] = {static_cast<float>(rtlCoordinate[2]), static_cast<float>(rtlCoordinate[0])};
+//                    wdata.meta.dataArea[0] |= 0x04;
+//                    memcpy(wdata.meta.xDis, &line[0], sizeof(line[0]));
+//                    memcpy(wdata.meta.xAngle, &line[1], sizeof(line[0]));
+//                }
+//                if ((res & 2) != 0) {
+//                    float line[] = {static_cast<float>(rtlCoordinate[3]), static_cast<float>(rtlCoordinate[1])};
+//                    wdata.meta.dataArea[0] |= 0x08;
+//                    memcpy(wdata.meta.yDis, &line[0], sizeof(line[0]));
+//                    memcpy(wdata.meta.yAngle, &line[1], sizeof(line[0]));
+//                }
+//            }
+//        } else if (tVideo0) {
+//            rtlInfo.init();
+//            thread thread11(rtlFinder, ref(rtlInfo));
+//            thread11.detach();
+//        }
     }
     return 0;
 }
