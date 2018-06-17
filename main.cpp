@@ -142,7 +142,7 @@ int main() {
         //cout << "Docking mode" << (info.result.meta.flag1[0] & (1 << 1)) << endl;
         //Docking mode
         if (((info.result.meta.flag1[0] & (1 << 1)) != 0) || ((info.result.meta.flag1[0] & (1 << 5)) != 0)) {
-            if (tVideo1)
+            if (tVideo0)
                 if ((state & DOCKING_MODE) == 0) {
                     state |= DOCKING_MODE;
                     short x, y, angle;
@@ -181,7 +181,7 @@ int main() {
         }
         //Take mode
         if (((info.result.meta.flag1[0] & (1 << 3)) != 0) || ((info.result.meta.flag1[0] & (1 << 4)) != 0)) {
-            if (tVideo1)
+            if (tVideo0)
                 if ((state & TAKE_MODE) == 0) {
                     state |= TAKE_MODE;
                     if ((info.result.meta.flag1[0] & (1 << 4)) != 0)
