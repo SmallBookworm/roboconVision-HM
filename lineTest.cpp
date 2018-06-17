@@ -270,7 +270,7 @@ vector<Vec4i> LineTest::findCorner(Mat dst) {
             int testLH = leftLine[1] - leftLine[3];
             int testRH = rightLine[1] - rightLine[3];
             int testW = rightLine[0] - leftLine[0];
-            if (testLH > maxHeight && testRH > maxHeight && (testLH > 5 * testW) && (testRH > 5 * testW)) {
+            if (testLH > minHeight && testRH > minHeight && (testLH > 5 * testW) && (testRH > 5 * testW)) {
                 lines.push_back(leftLine);
                 lines.push_back(rightLine);
             }
@@ -427,18 +427,18 @@ int LineTest::watch(cv::Mat src) {
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
 
-        cout << "angle: " << data_final[0] << endl;
-        cout << "vectAngle: " << data_final[1] << endl;
-        cout << "vectLength: " << data_final[2] << endl;
+//        cout << "angle: " << data_final[0] << endl;
+//        cout << "vectAngle: " << data_final[1] << endl;
+//        cout << "vectLength: " << data_final[2] << endl;
         info_value[0] = data_final[2];
         info_value[1] = data_final[1];
         info_value[2] = data_final[0];
     } else if (lines.size() < 4) {
-        cout << "invalid " << lines.size() << endl;
+//        cout << "invalid " << lines.size() << endl;
     } else if (lines.size() > 4) {
         //imshow("eeee",src);
         //waitKey(0);
-        cout << "invalid " << lines.size() << endl;
+//        cout << "invalid " << lines.size() << endl;
     }
     //waitKey(0);
     return static_cast<int>(lines.size());
@@ -447,10 +447,10 @@ int LineTest::watch(cv::Mat src) {
 int LineTest::operator()(LineInfo &info) {
     cout << "dock" << endl;
     //system("v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video1");
-    VideoCapture capture("/dev/video1");
+    VideoCapture capture("/dev/video0");
     //capture.open("/home/peng/下载/realse/1.avi");
 
-    int fd = open("/dev/video1", O_RDWR);
+    int fd = open("/dev/video0", O_RDWR);
     if (fd >= 0) {
         struct v4l2_control ctrl;
         ctrl.id = V4L2_CID_EXPOSURE_AUTO;
@@ -482,7 +482,7 @@ int LineTest::operator()(LineInfo &info) {
         cout << "TZ1" << endl;
         cornerSize = 120;
         thresh = 57;
-        maxHeight = 80;
+        minHeight = 80;
         lineOption.WIDTH = 640;
         lineOption.HEIGHT = 480;
         lineOption.SD = 566;//标准的标准

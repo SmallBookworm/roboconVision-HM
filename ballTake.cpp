@@ -403,10 +403,10 @@ int BallTake::operator()(LineInfo &info) {
     cout << "take" << endl;
     //system("v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video1");
 
-    VideoCapture capture("/dev/video1");
+    VideoCapture capture("/dev/video0");
     //capture.open("/home/peng/下载/realse/1.avi");
 
-    int fd = open("/dev/video1", O_RDWR);
+    int fd = open("/dev/video0", O_RDWR);
     if (fd >= 0) {
         struct v4l2_control ctrl;
         ctrl.id = V4L2_CID_EXPOSURE_AUTO;

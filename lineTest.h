@@ -49,7 +49,7 @@ public:
     std::vector<float> yRecord;
     int cornerSize=120;
     int thresh=57;
-    int maxHeight=80;
+    int minHeight=80;
 public:
     int watch(cv::Mat res);
 
