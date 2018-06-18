@@ -382,18 +382,18 @@ int BallTake::watch(cv::Mat src) {
         data_final.push_back(vectAngle);
         data_final.push_back(vectLength);
 
-        cout << "angle: " << data_final[0] << endl;
-        cout << "vectAngle: " << data_final[1] << endl;
-        cout << "vectLength: " << data_final[2] << endl;
+//        cout << "angle: " << data_final[0] << endl;
+//        cout << "vectAngle: " << data_final[1] << endl;
+//        cout << "vectLength: " << data_final[2] << endl;
         info_value[0] = data_final[2];
         info_value[1] = data_final[1];
         info_value[2] = data_final[0];
     } else if (lines.size() < 2) {
-        cout << "invalid " << lines.size() << endl;
+//        cout << "invalid " << lines.size() << endl;
     } else if (lines.size() > 2) {
         //imshow("eeee",src);
         //waitKey(0);
-        cout << "invalid " << lines.size() << endl;
+//        cout << "invalid " << lines.size() << endl;
     }
     //waitKey(0);
     return static_cast<int>(lines.size());
@@ -410,17 +410,17 @@ int BallTake::operator()(LineInfo &info) {
     if (fd >= 0) {
         struct v4l2_control ctrl;
         ctrl.id = V4L2_CID_EXPOSURE_AUTO;
-        ctrl.value = V4L2_EXPOSURE_MANUAL;
+        ctrl.value = 3;
         int ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl);
 
-        struct v4l2_control ctrl1;
-        ctrl1.id = V4L2_CID_EXPOSURE_ABSOLUTE;
-        ctrl1.value = 10000;
-        ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl1);
-        if (ret < 0) {
-            printf("Get exposure failed (%d)\n", ret);
-        } else
-            printf("\nGet Exposure :[%d]\n", ctrl1.value);
+//        struct v4l2_control ctrl1;
+//        ctrl1.id = V4L2_CID_EXPOSURE_ABSOLUTE;
+//        ctrl1.value = 10000;
+//        ret = ioctl(fd, VIDIOC_S_CTRL, &ctrl1);
+//        if (ret < 0) {
+//            printf("Get exposure failed (%d)\n", ret);
+//        } else
+//            printf("\nGet Exposure :[%d]\n", ctrl1.value);
     }
     //close when we will not used
     close(fd);
@@ -467,7 +467,8 @@ int BallTake::operator()(LineInfo &info) {
         int size = watch(srcImage);
         //test
         //cout << size << endl;
-        if (size == 2 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])) {
+        if (size == 2 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])
+            && !isinf(info_value[0]) && !isinf(info_value[1]) && !isinf(info_value[2])) {
             info.set(info_value);
         }
         //test

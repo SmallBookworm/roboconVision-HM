@@ -514,7 +514,8 @@ int LineTest::operator()(LineInfo &info) {
         int size = watch(srcImage);
         //test
         //cout << size << endl;
-        if (size == 4 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])) {
+        if (size == 4 && !isnan(info_value[0]) && !isnan(info_value[1]) && !isnan(info_value[2])
+            && !isinf(info_value[0]) && !isinf(info_value[1]) && !isinf(info_value[2])) {
             info.set(info_value);
         }
         //test
